@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Quick Capture — Giamma Bellato</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --ink:#0A0806;--cream:#F5F0E8;--gold:#C9A84C;--gold-l:#E8D5A0;--gold-d:#8B6914;
+  --warm:#6B6058;--border:#D4C8B0;--card:#FDFAF4;--red:#8B1A1A;--grn:#2D5A27;
+  --teal:#1A3A3A;--h:56px;
+}
+html,body{height:100%;background:var(--ink)}
+body{font-family:'DM Mono',monospace;font-size:14px;color:var(--ink);overscroll-behavior:none}
+
+/* ── SHELL ── */
+.app{display:flex;flex-direction:column;min-height:100vh;max-width:480px;margin:0 auto;background:var(--cream)}
+.topbar{background:var(--ink);border-bottom:2px solid var(--gold);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
+.topbar-brand{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--cream);font-weight:400;letter-spacing:.04em}
+.topbar-brand span{color:var(--gold)}
+.topbar-sub{font-size:9px;color:var(--gold);letter-spacing:.2em;text-transform:uppercase}
+.topbar-right{font-size:10px;color:#6B6058;text-align:right;line-height:1.6}
+
+/* ── TABS ── */
+.tabs{display:flex;background:var(--ink);border-bottom:1px solid #1E1A14}
+.tab{flex:1;padding:12px 8px;text-align:center;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#6B6058;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* ── CONTENT ── */
+.content{flex:1;padding:20px 18px 100px}
+.screen{display:none}
+.screen.active{display:block}
+
+/* ── SECTION HEADER ── */
+.sh{margin-bottom:18px}
+.sh-label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-d);margin-bottom:4px}
+.sh-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;line-height:1.1}
+.sh-divider{height:1px;background:linear-gradient(90deg,var(--gold),transparent);margin-top:10px}
+
+/* ── FORM ── */
+.field{margin-bottom:14px}
+.field label{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--warm);margin-bottom:6px}
+.field input,.field select,.field textarea{
+  width:100%;padding:12px 14px;border:1px solid var(--border);
+  background:#fff;font-family:'DM Mono',monospace;font-size:13px;
+  color:var(--ink);border-radius:0;appearance:none;
+  transition:border-color .15s;
+}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold)}
+.field textarea{min-height:80px;resize:vertical}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%23C9A84C'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+
+/* ── AGENCY CHECK ── */
+.agency-check{
+  background:var(--ink);border-left:3px solid var(--gold);
+  padding:14px 16px;margin:16px 0;
+}
+.agency-check-title{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.agency-btns{display:flex;gap:8px}
+.agency-btn{
+  flex:1;padding:10px;text-align:center;font-family:'DM Mono',monospace;
+  font-size:11px;letter-spacing:.06em;cursor:pointer;border:1px solid;
+  transition:all .15s;background:transparent;
+}
+.agency-btn.privato{color:#4CAF50;border-color:#4CAF50}
+.agency-btn.privato.selected{background:#4CAF50;color:#fff}
+.agency-btn.agenzia{color:var(--red);border-color:var(--red)}
+.agency-btn.agenzia.selected{background:var(--red);color:#fff}
+.agency-btn.non-so{color:var(--gold);border-color:var(--gold)}
+.agency-btn.non-so.selected{background:var(--gold);color:var(--ink)}
+
+/* ── RESULT PANEL ── */
+.result-panel{display:none;margin-top:16px}
+.result-panel.show{display:block}
+.result-header{padding:12px 16px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:500}
+.result-header.gold{background:var(--gold);color:var(--ink)}
+.result-header.red{background:var(--red);color:#fff}
+.result-header.teal{background:var(--teal);color:var(--gold)}
+.result-body{background:#fff;border:1px solid var(--border);padding:14px 16px;font-size:12px;line-height:1.7;color:var(--ink);white-space:pre-wrap}
+.copy-btn{
+  width:100%;padding:12px;background:var(--ink);color:var(--gold);
+  border:1px solid var(--gold);font-family:'DM Mono',monospace;
+  font-size:11px;letter-spacing:.08em;cursor:pointer;margin-top:6px;
+  text-transform:uppercase;transition:all .15s;
+}
+.copy-btn:active{background:var(--gold);color:var(--ink)}
+.copy-btn.copied{background:var(--grn);border-color:var(--grn);color:#fff}
+
+/* ── BIG BTN ── */
+.big-btn{
+  width:100%;padding:16px;background:var(--gold);color:var(--ink);
+  border:none;font-family:'Cormorant Garamond',serif;font-size:20px;
+  font-weight:500;cursor:pointer;letter-spacing:.04em;margin-top:8px;
+  transition:all .15s;
+}
+.big-btn:active{filter:brightness(.9)}
+.big-btn.secondary{background:var(--ink);color:var(--gold);border:1px solid var(--gold);font-family:'DM Mono',monospace;font-size:12px}
+
+/* ── PRIORITY BADGE ── */
+.priority{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+.priority.A{background:#E8F5E9;color:#2D5A27;border:1px solid #4CAF50}
+.priority.B{background:#FFF8E1;color:#7A5A00;border:1px solid var(--gold)}
+.priority.C{background:#ECEFF1;color:#546E7A;border:1px solid #90A4AE}
+
+/* ── LEAD LIST ── */
+.lead-item{background:var(--card);border:1px solid var(--border);padding:14px 16px;margin-bottom:10px;position:relative;cursor:pointer;transition:all .15s}
+.lead-item::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%}
+.lead-item.A::before{background:#4CAF50}
+.lead-item.B::before{background:var(--gold)}
+.lead-item.C::before{background:#90A4AE}
+.lead-item:active{transform:scale(.99)}
+.lead-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:400;margin-bottom:4px}
+.lead-meta{font-size:10px;color:var(--warm);line-height:1.6}
+.lead-badge{display:inline-block;padding:2px 8px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;border-radius:20px}
+.lead-badge.privato{background:#E8F5E9;color:#2D5A27}
+.lead-badge.agenzia{background:#FFEBEE;color:var(--red)}
+.lead-badge.non-so{background:#FFF8E1;color:#7A5A00}
+.empty-state{text-align:center;padding:48px 24px;color:var(--warm)}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-title{font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:8px;color:var(--ink)}
+.empty-desc{font-size:11px;line-height:1.7}
+
+/* ── STALE TRACKER ── */
+.stale-card{background:var(--card);border:1px solid var(--border);padding:16px;margin-bottom:12px}
+.stale-days{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--red);line-height:1}
+.stale-label{font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--warm);margin-bottom:8px}
+.stale-addr{font-size:13px;font-weight:500;margin-bottom:4px}
+.stale-meta{font-size:11px;color:var(--warm);line-height:1.5}
+.stale-action{font-size:11px;color:var(--gold-d);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+.stale-action::before{content:'→ ';color:var(--gold)}
+
+/* ── TIPS ── */
+.tip-card{background:var(--ink);border-left:3px solid var(--gold);padding:14px 16px;margin-bottom:10px}
+.tip-num{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--gold);line-height:1;float:left;margin-right:12px}
+.tip-title{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:5px}
+.tip-text{font-size:11px;color:#8A8070;line-height:1.7;clear:none}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--ink);border-top:2px solid var(--gold);display:flex;z-index:100}
+.nav-btn{flex:1;padding:12px 8px 10px;text-align:center;cursor:pointer;transition:all .15s;border:none;background:transparent}
+.nav-icon{font-size:20px;display:block;margin-bottom:2px}
+.nav-label{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#6B6058}
+.nav-btn.active .nav-label{color:var(--gold)}
+.nav-btn.active .nav-icon{filter:none}
+
+/* ── SAVED SUCCESS ── */
+.toast{
+  position:fixed;top:80px;left:50%;transform:translateX(-50%);
+  background:var(--grn);color:#fff;padding:10px 24px;
+  font-size:12px;letter-spacing:.08em;z-index:999;
+  opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div>
+      <div class="topbar-brand">Quick <span>Capture</span></div>
+      <div class="topbar-sub">Giamma Bellato · Torino</div>
+    </div>
+    <div class="topbar-right" id="topbarCount">0 lead<br>salvati</div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ── SCREEN: CATTURA ── -->
+    <div class="screen active" id="screenCattura">
+      <div class="sh">
+        <div class="sh-label">Nuovo segnale</div>
+        <div class="sh-title">Cattura lead</div>
+        <div class="sh-divider"></div>
+      </div>
+
+      <div class="field">
+        <label>Zona / Indirizzo</label>
+        <input type="text" id="fZona" placeholder="Es. Crocetta, Via Lamarmora 80...">
+      </div>
+
+      <div class="field">
+        <label>Tipo immobile</label>
+        <select id="fTipo">
+          <option value="">Seleziona...</option>
+          <option>Appartamento</option>
+          <option>Attico</option>
+          <option>Villa</option>
+          <option>Casa indipendente</option>
+          <option>Trilocale</option>
+          <option>Quadrilocale</option>
+          <option>Bilocale</option>
+          <option>Cielo-terra</option>
+          <option>Altro</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Come l'hai trovato</label>
+        <select id="fFonte">
+          <option value="">Seleziona...</option>
+          <option>Passaparola / conoscente</option>
+          <option>Cartello "Vendesi" in strada</option>
+          <option>Post Facebook privato</option>
+          <option>Subito / Bakeka privato</option>
+          <option>Nextdoor / vicini</option>
+          <option>Annuncio stantio sul portale</option>
+          <option>Segnale LinkedIn</option>
+          <option>Forum expat</option>
+          <option>Asta giudiziaria</option>
+          <option>Altro</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Note veloci (facoltativo)</label>
+        <textarea id="fNote" placeholder="Prezzo richiesto, condizioni, motivazione vendita, contatto..."></textarea>
+      </div>
+
+      <!-- AGENCY CHECK -->
+      <div class="agency-check">
+        <div class="agency-check-title">È già con un'agenzia?</div>
+        <div class="agency-btns">
+          <button class="agency-btn privato" id="btnPrivato" onclick="setAgency('privato')">✓ No, privato</button>
+          <button class="agency-btn agenzia" id="btnAgenzia" onclick="setAgency('agenzia')">✗ Sì, agenzia</button>
+          <button class="agency-btn non-so" id="btnNonso" onclick="setAgency('non-so')">? Non so</button>
+        </div>
+      </div>
+
+      <!-- RESULT PANEL -->
+      <div class="result-panel" id="resultPanel">
+        <div class="result-header gold" id="resultHeader">⚡ PRIORITÀ A — CHIAMA OGGI</div>
+        <div class="result-body" id="resultBody"></div>
+        <button class="copy-btn" id="copyWa" onclick="copyResult('wa')">Copia WhatsApp</button>
+        <button class="copy-btn" id="copyEmail" onclick="copyResult('email')" style="margin-top:6px;background:transparent;color:var(--ink);border-color:var(--border)">Copia Email</button>
+      </div>
+
+      <button class="big-btn" onclick="salvaLead()" style="margin-top:16px">Salva nel database →</button>
+      <button class="big-btn secondary" onclick="resetForm()" style="margin-top:8px">Nuovo segnale</button>
+    </div>
+
+    <!-- ── SCREEN: SALVATI ── -->
+    <div class="screen" id="screenSalvati">
+      <div class="sh">
+        <div class="sh-label">Database locale</div>
+        <div class="sh-title">Lead salvati</div>
+        <div class="sh-divider"></div>
+      </div>
+      <div id="leadList"></div>
+    </div>
+
+    <!-- ── SCREEN: STALE TRACKER ── -->
+    <div class="screen" id="screenStale">
+      <div class="sh">
+        <div class="sh-label">Opportunità nascoste</div>
+        <div class="sh-title">Annunci stantii</div>
+        <div class="sh-divider"></div>
+      </div>
+      <p style="font-size:11px;color:var(--warm);line-height:1.7;margin-bottom:18px">
+        Un immobile sul mercato da oltre 90 giorni = l'agenzia non ha venduto = il proprietario è frustrato.
+        È il momento perfetto per presentarti come alternativa.
+      </p>
+      <div id="staleList">
+        <div class="stale-card">
+          <div class="stale-label">Giorni sul mercato</div>
+          <div class="stale-days">127</div>
+          <div class="stale-addr">Via Massena 103 — Crocetta</div>
+          <div class="stale-meta">€ 580.000 · 140 mq · Idealista · Agenzia XYZ</div>
+          <div class="stale-action">Contatta il proprietario direttamente. L'agenzia non sta vendendo — proponi alternative.</div>
+        </div>
+        <div class="stale-card">
+          <div class="stale-label">Giorni sul mercato</div>
+          <div class="stale-days">94</div>
+          <div class="stale-addr">Corso Moncalieri 291 — Pilonetto</div>
+          <div class="stale-meta">€ 490.000 · 195 mq · Casa.it · Privato</div>
+          <div class="stale-action">Privato stanco di gestire — ottimo momento per proporre assistenza professionale.</div>
+        </div>
+      </div>
+      <div style="margin-top:16px">
+        <div class="field">
+          <label>Aggiungi annuncio stantio manualmente</label>
+          <input type="text" id="staleAddr" placeholder="Indirizzo e zona">
+        </div>
+        <div style="display:flex;gap:8px">
+          <div class="field" style="flex:1">
+            <label>Giorni sul mercato</label>
+            <input type="number" id="staleDays" placeholder="Es. 120">
+          </div>
+          <div class="field" style="flex:1">
+            <label>Agenzia o privato</label>
+            <select id="staleType">
+              <option>Agenzia</option>
+              <option>Privato</option>
+            </select>
+          </div>
+        </div>
+        <button class="big-btn" onclick="addStale()">Aggiungi stantio</button>
+      </div>
+    </div>
+
+    <!-- ── SCREEN: TATTICHE ── -->
+    <div class="screen" id="screenTattiche">
+      <div class="sh">
+        <div class="sh-label">Come trovare case senza agenzia</div>
+        <div class="sh-title">Tattiche operative</div>
+        <div class="sh-divider"></div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-num">1</div>
+        <div class="tip-title">Cartelli in strada</div>
+        <div class="tip-text" style="overflow:hidden">Gira le zone target ogni 2 settimane. Fotografa ogni cartello "Vendesi" con numero visibile. Sono i lead più caldi — nessuna agenzia di mezzo.</div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-num">2</div>
+        <div class="tip-title">Portieri e amministratori</div>
+        <div class="tip-text" style="overflow:hidden">I portieri dei palazzi premium in Crocetta e Borgo Po sanno tutto. Un caffè ogni tanto = informazioni su appartamenti in vendita prima che escano sul mercato.</div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-num">3</div>
+        <div class="tip-title">Annunci stantii = agenzia che fallisce</div>
+        <div class="tip-text" style="overflow:hidden">90+ giorni senza vendita = proprietario frustrato. Non contattare l'agenzia — cerca il proprietario diretto. Spesso è reperibile nel rogito pubblico.</div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-num">4</div>
+        <div class="tip-title">Facebook gruppi privati</div>
+        <div class="tip-text" style="overflow:hidden">Monitora ogni giorno: "Vendo Compro Casa Torino", "Case Torino e Provincia", "Expats Turin". Commenta subito — la velocità conta.</div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-num">5</div>
+        <div class="tip-title">Successioni e divorzi</div>
+        <div class="tip-text" style="overflow:hidden">I notai e gli avvocati di famiglia sono alleati strategici. Una relazione professionale con 2-3 studi porta lead che non arrivano mai sui portali.</div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-num">6</div>
+        <div class="tip-title">Traslochi = vendita imminente</div>
+        <div class="tip-text" style="overflow:hidden">Un camion dei traslochi in zona premium = qualcuno si sta spostando. Lascia un biglietto nella cassetta del vicino. Uno su dieci risponde.</div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-num">7</div>
+        <div class="tip-title">Google Alerts avanzati</div>
+        <div class="tip-text" style="overflow:hidden">Usa: "vendo direttamente" Torino, "senza agenzia" appartamento Torino, "cedesi" villa collina Torino. Risultati molto più puliti dei portali.</div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button class="nav-btn active" id="nav0" onclick="showScreen(0)">
+      <span class="nav-icon">⚡</span>
+      <span class="nav-label">Cattura</span>
+    </button>
+    <button class="nav-btn" id="nav1" onclick="showScreen(1)">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label">Salvati</span>
+    </button>
+    <button class="nav-btn" id="nav2" onclick="showScreen(2)">
+      <span class="nav-icon">⏱</span>
+      <span class="nav-label">Stantii</span>
+    </button>
+    <button class="nav-btn" id="nav3" onclick="showScreen(3)">
+      <span class="nav-icon">🎯</span>
+      <span class="nav-label">Tattiche</span>
+    </button>
+  </div>
+
+</div><!-- /app -->
+
+<div class="toast" id="toast">✓ Lead salvato!</div>
+
+<script>
+const STORAGE_KEY = 'qc_leads_torino';
+let currentAgency = null;
+let currentResult = {wa:'', email:''};
+
+const SCREENS = ['screenCattura','screenSalvati','screenStale','screenTattiche'];
+
+function showScreen(idx){
+  SCREENS.forEach((s,i)=>{
+    document.getElementById(s).classList.toggle('active', i===idx);
+    document.getElementById('nav'+i).classList.toggle('active', i===idx);
+  });
+  if(idx===1) renderLeadList();
+}
+
+/* ── AGENCY SELECTION ── */
+function setAgency(type){
+  currentAgency = type;
+  ['privato','agenzia','non-so'].forEach(t=>{
+    document.getElementById('btn'+t.replace('-','').charAt(0).toUpperCase()+t.replace('-','').slice(1)).classList.remove('selected');
+  });
+  document.getElementById('btn'+type.replace('-','').charAt(0).toUpperCase()+type.replace('-','').slice(1)).classList.add('selected');
+  generateMessage();
+}
+
+/* ── MESSAGE GENERATOR ── */
+function generateMessage(){
+  const zona = document.getElementById('fZona').value || 'zona';
+  const tipo = document.getElementById('fTipo').value || 'immobile';
+  const fonte = document.getElementById('fFonte').value || '';
+  const panel = document.getElementById('resultPanel');
+  const header = document.getElementById('resultHeader');
+  const body = document.getElementById('resultBody');
+
+  panel.classList.add('show');
+
+  if(currentAgency === 'privato'){
+    header.className = 'result-header gold';
+    header.textContent = '⚡ PRIORITÀ A — CHIAMA OGGI';
+    const wa = `Buongiorno, ho saputo che potrebbe essere interessato a vendere ${tipo.toLowerCase()} in ${zona}.\nSeguo acquirenti attivi in questa zona — potrei avere il cliente giusto.\nLe rubo 2 minuti questa settimana?\nGiamma Bellato`;
+    const email = `Oggetto: ${tipo} in ${zona} — ho clienti attivi\n\nGentile proprietario,\n\nho saputo che potrebbe essere interessato a vendere il suo ${tipo.toLowerCase()} in ${zona}.\n\nSeguo il mercato di questa zona da anni e ho acquirenti attivi in cerca proprio in questa area. Potrei avere il profilo giusto per lei.\n\nPosso chiamarla questa settimana per un confronto rapido?\n\nGiamma Bellato\nGIAMMARIABELLATO@GMAIL.COM`;
+    currentResult = {wa, email};
+    body.textContent = wa;
+
+  } else if(currentAgency === 'agenzia'){
+    header.className = 'result-header red';
+    header.textContent = '⚠ BASSA PRIORITÀ — già con agenzia';
+    const wa = `Buongiorno, ho visto il ${tipo.toLowerCase()} in ${zona}.\nSo che è già seguito da un'agenzia — nessun problema.\nSe dovesse cambiare situazione, sono qui.\nGiamma Bellato`;
+    const email = `Oggetto: ${tipo} in ${zona} — per il futuro\n\nGentile proprietario,\n\nho notato il suo ${tipo.toLowerCase()} in ${zona}.\nSo che sta già lavorando con un'agenzia e non voglio disturbare.\nSe la situazione dovesse cambiare, sarei felice di confrontarci.\n\nGiamma Bellato\nGIAMMARIABELLATO@GMAIL.COM`;
+    currentResult = {wa, email};
+    body.textContent = wa;
+
+  } else {
+    header.className = 'result-header teal';
+    header.textContent = '? DA VERIFICARE — controlla prima';
+    const wa = `Buongiorno, ho visto il ${tipo.toLowerCase()} in ${zona}.\nÈ ancora disponibile? Lo gestisce direttamente lei?\nGiamma Bellato`;
+    const email = `Oggetto: ${tipo} in ${zona} — info disponibilità\n\nGentile proprietario,\n\nho visto il suo ${tipo.toLowerCase()} in ${zona}.\nPotrebbe dirmi se è ancora disponibile e se lo gestisce direttamente?\n\nGiamma Bellato\nGIAMMARIABELLATO@GMAIL.COM`;
+    currentResult = {wa, email};
+    body.textContent = wa;
+  }
+}
+
+function copyResult(type){
+  const text = type==='wa' ? currentResult.wa : currentResult.email;
+  const btn = document.getElementById(type==='wa'?'copyWa':'copyEmail');
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='✓ Copiato!';
+    btn.classList.add('copied');
+    setTimeout(()=>{
+      btn.textContent = type==='wa'?'Copia WhatsApp':'Copia Email';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+/* ── SAVE LEAD ── */
+function salvaLead(){
+  const zona = document.getElementById('fZona').value;
+  if(!zona){ alert('Inserisci almeno zona / indirizzo'); return; }
+  const leads = getLeads();
+  const id = 'QC-' + String(leads.length+1).padStart(3,'0');
+  leads.push({
+    id, zona,
+    tipo: document.getElementById('fTipo').value || 'Immobile',
+    fonte: document.getElementById('fFonte').value || '',
+    note: document.getElementById('fNote').value || '',
+    agency: currentAgency || 'non-so',
+    wa: currentResult.wa,
+    email: currentResult.email,
+    data: new Date().toLocaleDateString('it-IT'),
+    priority: currentAgency==='privato'?'A':currentAgency==='agenzia'?'C':'B'
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(leads));
+  updateCount();
+  showToast('✓ Lead salvato!');
+  resetForm();
+}
+
+function getLeads(){ try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')}catch(e){return []} }
+function updateCount(){ const el=document.getElementById('topbarCount'); if(el){const n=getLeads().length; el.innerHTML=n+' lead<br>salvati';} }
+
+/* ── RENDER LEADS ── */
+function renderLeadList(){
+  const leads = getLeads().reverse();
+  const el = document.getElementById('leadList');
+  if(!leads.length){
+    el.innerHTML=`<div class="empty-state"><div class="empty-icon">📍</div><div class="empty-title">Nessun lead ancora</div><div class="empty-desc">Cattura il tuo primo segnale dalla scheda ⚡</div></div>`;
+    return;
+  }
+  el.innerHTML = leads.map(l=>`
+    <div class="lead-item ${l.priority}" onclick="openLead('${l.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <span class="priority ${l.priority}">${l.priority==='A'?'● Chiama oggi':l.priority==='B'?'● Verifica':'● Bassa priorità'}</span>
+        <span class="lead-badge ${l.agency}">${l.agency==='privato'?'Privato':l.agency==='agenzia'?'Agenzia':'?'}</span>
+      </div>
+      <div class="lead-name">${l.zona}</div>
+      <div class="lead-meta">${l.tipo} · ${l.fonte||'fonte non specificata'} · ${l.data}</div>
+      ${l.note?`<div style="font-size:11px;color:var(--warm);margin-top:6px">${l.note}</div>`:''}
+    </div>
+  `).join('');
+}
+
+function openLead(id){
+  const leads = getLeads();
+  const l = leads.find(x=>x.id===id);
+  if(!l) return;
+  if(confirm(`${l.zona}\n\nCopiare il messaggio WhatsApp?`)){
+    navigator.clipboard.writeText(l.wa);
+    showToast('✓ WhatsApp copiato!');
+  }
+}
+
+/* ── STALE TRACKER ── */
+function addStale(){
+  const addr = document.getElementById('staleAddr').value;
+  const days = document.getElementById('staleDays').value;
+  const type = document.getElementById('staleType').value;
+  if(!addr||!days){alert('Inserisci indirizzo e giorni');return;}
+  const card = document.createElement('div');
+  card.className='stale-card';
+  card.innerHTML=`<div class="stale-label">Giorni sul mercato</div><div class="stale-days">${days}</div><div class="stale-addr">${addr}</div><div class="stale-meta">${type}</div><div class="stale-action">${type==='Privato'?'Privato stanco — proponi assistenza professionale.':'Agenzia non ha venduto — contatta il proprietario direttamente.'}</div>`;
+  document.getElementById('staleList').prepend(card);
+  document.getElementById('staleAddr').value='';
+  document.getElementById('staleDays').value='';
+  showToast('✓ Stantio aggiunto!');
+}
+
+/* ── UTILS ── */
+function resetForm(){
+  ['fZona','fNote'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fTipo').selectedIndex=0;
+  document.getElementById('fFonte').selectedIndex=0;
+  currentAgency=null;
+  currentResult={wa:'',email:''};
+  ['btnPrivato','btnAgenzia','btnNonso'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('selected');});
+  document.getElementById('resultPanel').classList.remove('show');
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded',()=>{ updateCount(); });
+</script>
+</body>
+</html>
