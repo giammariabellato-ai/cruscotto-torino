@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -123,7 +124,11 @@ body{font-family:'DM Mono',monospace;font-size:14px;color:var(--ink);overscroll-
 .empty-desc{font-size:11px;line-height:1.7}
 
 /* ── STALE TRACKER ── */
-.stale-card{background:var(--card);border:1px solid var(--border);padding:16px;margin-bottom:12px}
+.stale-card{background:var(--card);border:1px solid var(--border);padding:16px;margin-bottom:12px;cursor:pointer;transition:all .15s;position:relative}
+.stale-card:active{transform:scale(.99);filter:brightness(.97)}
+.stale-card.clickable::after{content:'Apri annuncio →';position:absolute;bottom:12px;right:14px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.stale-card.no-link{cursor:default}
+.stale-card.no-link::after{display:none}
 .stale-days{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--red);line-height:1}
 .stale-label{font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--warm);margin-bottom:8px}
 .stale-addr{font-size:13px;font-weight:500;margin-bottom:4px}
@@ -266,25 +271,31 @@ body{font-family:'DM Mono',monospace;font-size:14px;color:var(--ink);overscroll-
         È il momento perfetto per presentarti come alternativa.
       </p>
       <div id="staleList">
-        <div class="stale-card">
+        <div class="stale-card no-link">
           <div class="stale-label">Giorni sul mercato</div>
           <div class="stale-days">127</div>
           <div class="stale-addr">Via Massena 103 — Crocetta</div>
-          <div class="stale-meta">€ 580.000 · 140 mq · Idealista · Agenzia XYZ</div>
-          <div class="stale-action">Contatta il proprietario direttamente. L'agenzia non sta vendendo — proponi alternative.</div>
+          <div class="stale-meta">€ 580.000 · 140 mq · Agenzia XYZ</div>
+          <div class="stale-action">Agenzia non ha venduto — contatta il proprietario direttamente.</div>
+          <div style="font-size:9px;color:#555;margin-top:8px;font-style:italic">Nessun link — aggiungi URL per aprire l'annuncio</div>
         </div>
-        <div class="stale-card">
+        <div class="stale-card clickable" onclick="window.open('https://www.subito.it','_blank')">
           <div class="stale-label">Giorni sul mercato</div>
-          <div class="stale-days">94</div>
+          <div class="stale-days" style="color:var(--gold)">94</div>
           <div class="stale-addr">Corso Moncalieri 291 — Pilonetto</div>
-          <div class="stale-meta">€ 490.000 · 195 mq · Casa.it · Privato</div>
-          <div class="stale-action">Privato stanco di gestire — ottimo momento per proporre assistenza professionale.</div>
+          <div class="stale-meta">€ 490.000 · 195 mq · Privato</div>
+          <div class="stale-action">Privato stanco di gestire — ottimo momento per proporre assistenza.</div>
         </div>
       </div>
       <div style="margin-top:16px">
+        <div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold-d);margin-bottom:12px">Aggiungi annuncio stantio</div>
         <div class="field">
-          <label>Aggiungi annuncio stantio manualmente</label>
-          <input type="text" id="staleAddr" placeholder="Indirizzo e zona">
+          <label>Indirizzo e zona</label>
+          <input type="text" id="staleAddr" placeholder="Es. Via Massena 103, Crocetta">
+        </div>
+        <div class="field">
+          <label>Link annuncio online</label>
+          <input type="url" id="staleLink" placeholder="https://www.idealista.it/immobile/...">
         </div>
         <div style="display:flex;gap:8px">
           <div class="field" style="flex:1">
@@ -292,12 +303,16 @@ body{font-family:'DM Mono',monospace;font-size:14px;color:var(--ink);overscroll-
             <input type="number" id="staleDays" placeholder="Es. 120">
           </div>
           <div class="field" style="flex:1">
-            <label>Agenzia o privato</label>
+            <label>Tipo</label>
             <select id="staleType">
               <option>Agenzia</option>
               <option>Privato</option>
             </select>
           </div>
+        </div>
+        <div class="field">
+          <label>Prezzo richiesto</label>
+          <input type="text" id="stalePrice" placeholder="Es. € 450.000">
         </div>
         <button class="big-btn" onclick="addStale()">Aggiungi stantio</button>
       </div>
@@ -517,14 +532,54 @@ function addStale(){
   const addr = document.getElementById('staleAddr').value;
   const days = document.getElementById('staleDays').value;
   const type = document.getElementById('staleType').value;
+  const link = document.getElementById('staleLink').value;
+  const price = document.getElementById('stalePrice').value;
   if(!addr||!days){alert('Inserisci indirizzo e giorni');return;}
-  const card = document.createElement('div');
-  card.className='stale-card';
-  card.innerHTML=`<div class="stale-label">Giorni sul mercato</div><div class="stale-days">${days}</div><div class="stale-addr">${addr}</div><div class="stale-meta">${type}</div><div class="stale-action">${type==='Privato'?'Privato stanco — proponi assistenza professionale.':'Agenzia non ha venduto — contatta il proprietario direttamente.'}</div>`;
-  document.getElementById('staleList').prepend(card);
-  document.getElementById('staleAddr').value='';
-  document.getElementById('staleDays').value='';
+
+  // Salva in localStorage
+  const stales = getStales();
+  stales.unshift({addr, days:parseInt(days), type, link, price, data: new Date().toLocaleDateString('it-IT')});
+  localStorage.setItem('qc_stales_torino', JSON.stringify(stales));
+
+  // Reset form
+  ['staleAddr','staleDays','staleLink','stalePrice'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('staleType').selectedIndex=0;
+
+  renderStales();
   showToast('✓ Stantio aggiunto!');
+}
+
+function getStales(){
+  try{return JSON.parse(localStorage.getItem('qc_stales_torino')||'[]')}catch(e){return []}
+}
+
+function renderStales(){
+  const stales = getStales();
+  const list = document.getElementById('staleList');
+  if(!stales.length){
+    // Mostra solo le card demo
+    return;
+  }
+  // Rimuovi card salvate precedenti
+  list.querySelectorAll('.saved-stale').forEach(el=>el.remove());
+  // Aggiungi in cima
+  stales.forEach(s=>{
+    const hasLink = s.link && s.link.trim() !== '';
+    const daysNum = parseInt(s.days);
+    const daysColor = daysNum >= 120 ? 'var(--red)' : daysNum >= 90 ? 'var(--gold)' : 'var(--grn)';
+    const card = document.createElement('div');
+    card.className = 'stale-card saved-stale ' + (hasLink ? 'clickable' : 'no-link');
+    if(hasLink) card.onclick = ()=>window.open(s.link,'_blank');
+    card.innerHTML = `
+      <div class="stale-label">Giorni sul mercato</div>
+      <div class="stale-days" style="color:${daysColor}">${s.days}</div>
+      <div class="stale-addr">${s.addr}</div>
+      <div class="stale-meta">${s.price||'Prezzo non inserito'} · ${s.type} · aggiunto ${s.data}</div>
+      <div class="stale-action">${s.type==='Privato'?'Privato stanco — proponi assistenza professionale.':'Agenzia non ha venduto — contatta il proprietario direttamente.'}</div>
+      ${!hasLink?'<div style="font-size:9px;color:#555;margin-top:8px;font-style:italic">Nessun link inserito</div>':''}
+    `;
+    list.prepend(card);
+  });
 }
 
 /* ── UTILS ── */
@@ -545,7 +600,7 @@ function showToast(msg){
 }
 
 /* ── INIT ── */
-document.addEventListener('DOMContentLoaded',()=>{ updateCount(); });
+document.addEventListener('DOMContentLoaded',()=>{ updateCount(); renderStales(); });
 </script>
 </body>
 </html>
