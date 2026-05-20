@@ -1049,58 +1049,73 @@ function addRadarAsLead(encodedName, encodedUrl){
 }
 
 /* ═══════════════ ANALISI LEAD — CLAUDE API ═══════════════ */
-async function analyzeLeadWithAI(record){
-  openModal(record);
+function analyzeLeadWithAI(record){
   const prompt = `Sei l'assistente operativo di Giamma Bellato, agente immobiliare a Torino.
 Zone prioritarie: Crocetta, Borgo Po, Gran Madre, Collina, Centro storico, Precollina.
 Regole: solo privati (no agenzie), solo contatti pubblici, max 1 contatto soft per agenzia.
 
-Analizza questo lead e produci un'analisi completa:
+Analizza questo lead e produci:
+1. SCORE: A (chiama oggi) / B (chiama settimana) / C (monitora)
+2. MOTIVO dello score
+3. AZIONE immediata concreta
+4. MESSAGGIO WHATSAPP pronto (max 5 righe, firma Giamma Bellato)
+5. EMAIL pronta (oggetto + corpo, max 8 righe, firma GIAMMARIABELLATO@GMAIL.COM)
+6. FOLLOW-UP (3 righe se non risponde entro 5 giorni)
 
-LEAD:
+LEAD DA ANALIZZARE:
 - ID: ${record.ID}
 - Zona: ${record.Zona}
 - Asset: ${record['Titolo / Asset']}
 - Categoria: ${record.Categoria}
 - Divisione: ${record.Divisione}
 - Canale: ${record['Canale / Contatto']}
-- Stato attuale: ${record['Stato / Prossima azione']}
+- Stato: ${record['Stato / Prossima azione']}
 - Link: ${record['Link diretto'] || 'assente'}
 
-Rispondi SOLO con un oggetto JSON valido, nessun testo prima o dopo:
-{
-  "score": "A",
-  "score_label": "Chiama oggi",
-  "motivo": "spiegazione breve del perché questo score",
-  "azione": "cosa fare adesso — specifico e operativo",
-  "whatsapp": "messaggio WhatsApp pronto da inviare — max 5 righe — tono consulente non venditore — firma Giamma Bellato",
-  "email_oggetto": "oggetto email",
-  "email_corpo": "corpo email pronto — max 8 righe — firma con GIAMMARIABELLATO@GMAIL.COM",
-  "follow_up": "messaggio follow-up breve se non risponde entro 5 giorni — max 3 righe"
-}
+Score A = link diretto + zona premium + contatto verificabile
+Score B = zona ok, contatto da verificare
+Score C = link mancante o zona secondaria`;
 
-Score A = chiama oggi (link diretto + zona premium + contatto verificabile)
-Score B = chiama questa settimana (zona ok, contatto da verificare)
-Score C = monitora (zona secondaria o link mancante o categoria sospesi/watchlist)`;
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        messages:[{role:'user', content: prompt}]
-      })
-    });
-    const data = await res.json();
-    const raw = data.content?.find(b=>b.type==='text')?.text || '';
-    const clean = raw.replace(/```json|```/g,'').trim();
-    const parsed = JSON.parse(clean);
-    renderAnalysis(record, parsed);
-  } catch(e) {
-    renderError(e.message);
-  }
+  // Copia il prompt negli appunti
+  navigator.clipboard.writeText(prompt).then(()=>{
+    // Mostra modal con istruzioni
+    document.getElementById('modalTitle').textContent = `⚡ ${record.ID} — ${record.Zona}`;
+    document.getElementById('modalBody').innerHTML = `
+      <div style="background:var(--ink);border-left:3px solid var(--gold);padding:14px 18px;margin-bottom:16px">
+        <div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Prompt copiato negli appunti ✓</div>
+        <div style="font-size:11px;color:#8A8070;line-height:1.7">Il testo di analisi per questo lead è stato copiato automaticamente.</div>
+      </div>
+      <div class="analysis-section">
+        <div class="analysis-label">Come procedere</div>
+        <div style="font-size:12px;color:var(--ink);line-height:1.8;background:#fff;border:1px solid var(--border);padding:14px">
+          1. Apri <strong>Claude.ai</strong> in una nuova scheda<br>
+          2. Incolla il testo con <strong>Ctrl+V</strong><br>
+          3. Premi Invio — ricevi score + WhatsApp + Email
+        </div>
+      </div>
+      <a href="https://claude.ai/new" target="_blank" class="copy-btn" style="display:block;text-align:center;text-decoration:none;margin-top:10px;padding:12px">
+        Apri Claude.ai →
+      </a>
+      <div class="analysis-section" style="margin-top:16px">
+        <div class="analysis-label">Prompt da incollare</div>
+        <div class="analysis-text" style="font-size:10px;max-height:180px;overflow-y:auto">${esc(prompt)}</div>
+        <button class="copy-btn" onclick="navigator.clipboard.writeText(${JSON.stringify(prompt).replace(/"/g,'&quot;')});this.textContent='✓ Copiato!';this.classList.add('copied');setTimeout(()=>{this.textContent='Copia prompt';this.classList.remove('copied')},2000)" style="margin-top:6px">Copia prompt</button>
+      </div>
+    `;
+    document.getElementById('analysisModal').classList.add('open');
+  }).catch(()=>{
+    // Fallback se clipboard non disponibile
+    document.getElementById('modalTitle').textContent = `⚡ ${record.ID} — ${record.Zona}`;
+    document.getElementById('modalBody').innerHTML = `
+      <div class="analysis-section">
+        <div class="analysis-label">Copia questo prompt e incollalo su Claude.ai</div>
+        <div class="analysis-text" style="font-size:10px;max-height:220px;overflow-y:auto">${esc(prompt)}</div>
+        <button class="copy-btn" onclick="navigator.clipboard.writeText(${JSON.stringify(prompt).replace(/"/g,'&quot;')});this.textContent='✓ Copiato!';this.classList.add('copied');setTimeout(()=>{this.textContent='Copia prompt';this.classList.remove('copied')},2000)">Copia prompt</button>
+      </div>
+      <a href="https://claude.ai/new" target="_blank" class="copy-btn" style="display:block;text-align:center;text-decoration:none;margin-top:8px;padding:12px">Apri Claude.ai →</a>
+    `;
+    document.getElementById('analysisModal').classList.add('open');
+  });
 }
 
 function openModal(record){
