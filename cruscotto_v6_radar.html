@@ -404,6 +404,7 @@ td{padding:10px;border-bottom:1px solid #EDE7D8;vertical-align:top}
         <div class="field"><label>Canale / Contatto</label><input id="fCanale" placeholder="Telefono, portale, social..."></div>
         <div class="field full"><label>Link diretto</label><input id="fLink" placeholder="https://..."></div>
         <div class="field full"><label>Stato / Prossima azione</label><textarea id="fStato" placeholder="Chiamare, verificare telefono, follow-up, appuntamento..."></textarea></div>
+        <div class="field"><label>Data aggiunta</label><input type="date" id="fData"></div>
       </div>
       <div class="toolbar">
         <button class="btn" onclick="saveRecord()">Salva record</button>
@@ -413,7 +414,7 @@ td{padding:10px;border-bottom:1px solid #EDE7D8;vertical-align:top}
 
     <div class="table-wrap">
       <table>
-        <thead><tr><th>ID</th><th>Categoria</th><th>Divisione</th><th>Zona</th><th>Titolo / Asset</th><th>Link diretto</th><th>Canale / Contatto</th><th>Stato / Prossima azione</th></tr></thead>
+        <thead><tr><th>ID</th><th>Categoria</th><th>Divisione</th><th>Zona</th><th>Titolo / Asset</th><th>Link diretto</th><th>Canale / Contatto</th><th>Stato / Prossima azione</th><th>Data aggiunta</th></tr></thead>
         <tbody id="dbBody"></tbody>
       </table>
     </div>
@@ -676,7 +677,8 @@ function normalizeRecord(r){
     "Titolo / Asset": r["Titolo / Asset"] || r.titolo || r["Asset / Titolo"] || "",
     "Link diretto": r["Link diretto"] || r.link || r["Link diretto fonte"] || "",
     "Canale / Contatto": r["Canale / Contatto"] || r.canale || r.contatto || "",
-    "Stato / Prossima azione": r["Stato / Prossima azione"] || r.stato || r.note || ""
+    "Stato / Prossima azione": r["Stato / Prossima azione"] || r.stato || r.note || "",
+    "Data aggiunta": r["Data aggiunta"] || r.data || ""
   };
 }
 
@@ -777,12 +779,16 @@ function renderDb(){
     const linkCell=`<div class="link-cell">${lqBadge(url)}${openBtn}${(q==='generic'||q==='missing')? altBtn:''}</div>`;
     const stato=esc(r['Stato / Prossima azione']||'Da verificare');
     const id = esc(r.ID);
-    return `<tr><td>${id}</td><td>${esc(r.Categoria)}</td><td>${esc(r.Divisione)}</td><td>${esc(r.Zona)}</td><td>${esc(r['Titolo / Asset'])}</td><td>${linkCell}</td><td>${esc(r['Canale / Contatto'])}</td><td>${stato}<br><button class="analyze-btn" style="margin-top:6px" onclick="analyzeLeadWithAI(${JSON.stringify(r).replace(/"/g,'&quot;')})">⚡ Analizza</button></td></tr>`;
+    return `<tr><td>${id}</td><td>${esc(r.Categoria)}</td><td>${esc(r.Divisione)}</td><td>${esc(r.Zona)}</td><td>${esc(r['Titolo / Asset'])}</td><td>${linkCell}</td><td>${esc(r['Canale / Contatto'])}</td><td>${stato}<br><button class="analyze-btn" style="margin-top:6px" onclick="analyzeLeadWithAI(${JSON.stringify(r).replace(/"/g,'&quot;')})">⚡ Analizza</button></td><td style="white-space:nowrap;color:var(--warm);font-size:11px">${esc(r['Data aggiunta']||'—')}</td></tr>`;
   }).join('');
 }
 function toggleForm(force){
   const f=document.getElementById('recordForm');
   if(typeof force==='boolean') f.classList.toggle('open', force); else f.classList.toggle('open');
+  if(f.classList.contains('open')){
+    const d=new Date(), pad=n=>String(n).padStart(2,'0');
+    document.getElementById('fData').value=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  }
 }
 function saveRecord(){
   const manual=getManual();
@@ -794,10 +800,15 @@ function saveRecord(){
     "Titolo / Asset": document.getElementById('fTitolo').value,
     "Link diretto": document.getElementById('fLink').value,
     "Canale / Contatto": document.getElementById('fCanale').value,
-    "Stato / Prossima azione": document.getElementById('fStato').value || 'Da verificare'
+    "Stato / Prossima azione": document.getElementById('fStato').value || 'Da verificare',
+    "Data aggiunta": (() => {
+      const v = document.getElementById('fData').value;
+      if(v){ const [y,m,d]=v.split('-'); return `${d}/${m}/${y}`; }
+      return new Date().toLocaleDateString('it-IT');
+    })()
   };
   manual.push(rec); setManual(manual);
-  ['fId','fZona','fTitolo','fCanale','fLink','fStato'].forEach(id=>document.getElementById(id).value='');
+  ['fId','fZona','fTitolo','fCanale','fLink','fStato','fData'].forEach(id=>document.getElementById(id).value='');
   toggleForm(false); renderDb();
 }
 
@@ -816,7 +827,6 @@ function parseCSV(text){
 function importCruscotto(text, isAutoWatch=false){
   const rows=parseCSV(text); if(!rows.length)return;
   const h=rows[0].map(x=>x.trim());
-  const countBefore = getRecords().length;
   const data=rows.slice(1).map((r,i)=>{
     const obj={}; h.forEach((k,idx)=>obj[k]=(r[idx]||'').trim());
     return {
@@ -827,20 +837,19 @@ function importCruscotto(text, isAutoWatch=false){
       "Titolo / Asset": obj['Titolo / Asset'] || obj.Titolo || obj.Asset || '',
       "Link diretto": obj['Link diretto'] || obj.Link || '',
       "Canale / Contatto": obj['Canale / Contatto'] || obj.Canale || obj.Contatto || '',
-      "Stato / Prossima azione": obj['Stato / Prossima azione'] || obj.Stato || obj['Prossima azione'] || 'Da verificare'
+      "Stato / Prossima azione": obj['Stato / Prossima azione'] || obj.Stato || obj['Prossima azione'] || 'Da verificare',
+      "Data aggiunta": obj['Data aggiunta'] || obj.data || new Date().toLocaleDateString('it-IT')
     };
   });
-  setManual([...getManual(), ...data]);
-  const countAfter = getRecords().length;
-  const newCount = countAfter - countBefore;
-  if(isAutoWatch && newCount > 0){
-    newLeadsCount += newCount;
-    showNewLeadsNotification(newCount);
+  setManual(data);
+  if(isAutoWatch && data.length > 0){
+    newLeadsCount += data.length;
+    showNewLeadsNotification(data.length);
   }
   renderDb(); updateKpis();
 }
 function exportRows(rows, filename){
-  const h=["ID","Categoria","Divisione","Zona","Titolo / Asset","Link diretto","Canale / Contatto","Stato / Prossima azione"];
+  const h=["ID","Categoria","Divisione","Zona","Titolo / Asset","Link diretto","Canale / Contatto","Stato / Prossima azione","Data aggiunta"];
   const csv=[h.join(',')].concat(rows.map(r=>h.map(k=>`"${String(r[k]||'').replace(/"/g,'""')}"`).join(','))).join('\n');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
   const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url);
@@ -1049,73 +1058,58 @@ function addRadarAsLead(encodedName, encodedUrl){
 }
 
 /* ═══════════════ ANALISI LEAD — CLAUDE API ═══════════════ */
-function analyzeLeadWithAI(record){
+async function analyzeLeadWithAI(record){
+  openModal(record);
   const prompt = `Sei l'assistente operativo di Giamma Bellato, agente immobiliare a Torino.
 Zone prioritarie: Crocetta, Borgo Po, Gran Madre, Collina, Centro storico, Precollina.
 Regole: solo privati (no agenzie), solo contatti pubblici, max 1 contatto soft per agenzia.
 
-Analizza questo lead e produci:
-1. SCORE: A (chiama oggi) / B (chiama settimana) / C (monitora)
-2. MOTIVO dello score
-3. AZIONE immediata concreta
-4. MESSAGGIO WHATSAPP pronto (max 5 righe, firma Giamma Bellato)
-5. EMAIL pronta (oggetto + corpo, max 8 righe, firma GIAMMARIABELLATO@GMAIL.COM)
-6. FOLLOW-UP (3 righe se non risponde entro 5 giorni)
+Analizza questo lead e produci un'analisi completa:
 
-LEAD DA ANALIZZARE:
+LEAD:
 - ID: ${record.ID}
 - Zona: ${record.Zona}
 - Asset: ${record['Titolo / Asset']}
 - Categoria: ${record.Categoria}
 - Divisione: ${record.Divisione}
 - Canale: ${record['Canale / Contatto']}
-- Stato: ${record['Stato / Prossima azione']}
+- Stato attuale: ${record['Stato / Prossima azione']}
 - Link: ${record['Link diretto'] || 'assente'}
 
-Score A = link diretto + zona premium + contatto verificabile
-Score B = zona ok, contatto da verificare
-Score C = link mancante o zona secondaria`;
+Rispondi SOLO con un oggetto JSON valido, nessun testo prima o dopo:
+{
+  "score": "A",
+  "score_label": "Chiama oggi",
+  "motivo": "spiegazione breve del perché questo score",
+  "azione": "cosa fare adesso — specifico e operativo",
+  "whatsapp": "messaggio WhatsApp pronto da inviare — max 5 righe — tono consulente non venditore — firma Giamma Bellato",
+  "email_oggetto": "oggetto email",
+  "email_corpo": "corpo email pronto — max 8 righe — firma con GIAMMARIABELLATO@GMAIL.COM",
+  "follow_up": "messaggio follow-up breve se non risponde entro 5 giorni — max 3 righe"
+}
 
-  // Copia il prompt negli appunti
-  navigator.clipboard.writeText(prompt).then(()=>{
-    // Mostra modal con istruzioni
-    document.getElementById('modalTitle').textContent = `⚡ ${record.ID} — ${record.Zona}`;
-    document.getElementById('modalBody').innerHTML = `
-      <div style="background:var(--ink);border-left:3px solid var(--gold);padding:14px 18px;margin-bottom:16px">
-        <div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Prompt copiato negli appunti ✓</div>
-        <div style="font-size:11px;color:#8A8070;line-height:1.7">Il testo di analisi per questo lead è stato copiato automaticamente.</div>
-      </div>
-      <div class="analysis-section">
-        <div class="analysis-label">Come procedere</div>
-        <div style="font-size:12px;color:var(--ink);line-height:1.8;background:#fff;border:1px solid var(--border);padding:14px">
-          1. Apri <strong>Claude.ai</strong> in una nuova scheda<br>
-          2. Incolla il testo con <strong>Ctrl+V</strong><br>
-          3. Premi Invio — ricevi score + WhatsApp + Email
-        </div>
-      </div>
-      <a href="https://claude.ai/new" target="_blank" class="copy-btn" style="display:block;text-align:center;text-decoration:none;margin-top:10px;padding:12px">
-        Apri Claude.ai →
-      </a>
-      <div class="analysis-section" style="margin-top:16px">
-        <div class="analysis-label">Prompt da incollare</div>
-        <div class="analysis-text" style="font-size:10px;max-height:180px;overflow-y:auto">${esc(prompt)}</div>
-        <button class="copy-btn" onclick="navigator.clipboard.writeText(${JSON.stringify(prompt).replace(/"/g,'&quot;')});this.textContent='✓ Copiato!';this.classList.add('copied');setTimeout(()=>{this.textContent='Copia prompt';this.classList.remove('copied')},2000)" style="margin-top:6px">Copia prompt</button>
-      </div>
-    `;
-    document.getElementById('analysisModal').classList.add('open');
-  }).catch(()=>{
-    // Fallback se clipboard non disponibile
-    document.getElementById('modalTitle').textContent = `⚡ ${record.ID} — ${record.Zona}`;
-    document.getElementById('modalBody').innerHTML = `
-      <div class="analysis-section">
-        <div class="analysis-label">Copia questo prompt e incollalo su Claude.ai</div>
-        <div class="analysis-text" style="font-size:10px;max-height:220px;overflow-y:auto">${esc(prompt)}</div>
-        <button class="copy-btn" onclick="navigator.clipboard.writeText(${JSON.stringify(prompt).replace(/"/g,'&quot;')});this.textContent='✓ Copiato!';this.classList.add('copied');setTimeout(()=>{this.textContent='Copia prompt';this.classList.remove('copied')},2000)">Copia prompt</button>
-      </div>
-      <a href="https://claude.ai/new" target="_blank" class="copy-btn" style="display:block;text-align:center;text-decoration:none;margin-top:8px;padding:12px">Apri Claude.ai →</a>
-    `;
-    document.getElementById('analysisModal').classList.add('open');
-  });
+Score A = chiama oggi (link diretto + zona premium + contatto verificabile)
+Score B = chiama questa settimana (zona ok, contatto da verificare)
+Score C = monitora (zona secondaria o link mancante o categoria sospesi/watchlist)`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user', content: prompt}]
+      })
+    });
+    const data = await res.json();
+    const raw = data.content?.find(b=>b.type==='text')?.text || '';
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    renderAnalysis(record, parsed);
+  } catch(e) {
+    renderError(e.message);
+  }
 }
 
 function openModal(record){
