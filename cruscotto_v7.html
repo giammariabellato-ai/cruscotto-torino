@@ -77,6 +77,25 @@ td{padding:10px;border-bottom:1px solid #EDE7D8;vertical-align:top}
 .footer-left{font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--cream)}
 .footer-right{font-size:10px;color:#8A8070;text-align:right;line-height:1.8}
 
+/* ── LISTA URGENZA DA FARE OGGI ── */
+.urgenza-list{display:flex;flex-direction:column;gap:6px;margin-top:14px}
+.urgenza-row{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:10px;padding:10px 14px;background:var(--card);border:1px solid var(--border);cursor:pointer;transition:all .15s ease}
+.urgenza-row:hover{box-shadow:0 2px 12px rgba(15,12,8,.10);transform:translateX(2px)}
+.urgenza-row.ur-scaduta{border-left:4px solid var(--red);background:var(--red-s)}
+.urgenza-row.ur-urgente{border-left:4px solid #C9A84C;background:var(--yel-s)}
+.urgenza-row.ur-ok{border-left:4px solid var(--grn)}
+.urgenza-row.ur-nessuna{border-left:4px solid #ccc}
+.ur-badge{font-size:9px;padding:2px 7px;border-radius:2px;white-space:nowrap;font-weight:500}
+.ur-scaduta .ur-badge{background:var(--red);color:#fff}
+.ur-urgente .ur-badge{background:var(--gold);color:var(--ink)}
+.ur-ok .ur-badge{background:var(--grn);color:#fff}
+.ur-nessuna .ur-badge{background:#ccc;color:#555}
+.ur-titolo{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ur-zona{font-size:10px;color:var(--warm)}
+.ur-stato{font-size:10px;color:var(--warm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.ur-arrow{color:var(--gold);font-size:14px}
+.urgenza-empty{color:var(--warm);font-size:11px;font-style:italic;padding:12px 0}
+
 /* ── DATA PROSSIMA AZIONE alerts ── */
 .date-scaduta{background:var(--red-s);color:var(--red);padding:2px 7px;border-radius:2px;font-size:10px;font-weight:500;display:inline-block}
 .date-urgente{background:var(--yel-s);color:#7A5A00;padding:2px 7px;border-radius:2px;font-size:10px;display:inline-block}
@@ -309,6 +328,12 @@ td{padding:10px;border-bottom:1px solid #EDE7D8;vertical-align:top}
       <div class="today-card"><div class="today-n" id="todayFollow">0</div><div class="today-l">Follow-up</div></div>
       <div class="today-card"><div class="today-n" id="todayHot">0</div><div class="today-l">Contatti caldi</div></div>
       <div class="today-card" style="border-top:3px solid var(--red)"><div class="today-n" id="todayScadute" style="color:var(--red)">0</div><div class="today-l" style="color:var(--red)">Azioni scadute</div></div>
+    </div>
+
+    <!-- LISTA URGENZA -->
+    <div class="card" style="margin-top:18px">
+      <div class="card-title">⚡ Priorità operative — ordinate per urgenza</div>
+      <div id="urgenzaList" class="urgenza-list"></div>
     </div>
     <div class="card">
       <div class="card-title">Azioni rapide</div>
@@ -714,13 +739,64 @@ function updateKpis(){
   }).length);
 }
 
+/* ═══════════════ LISTA URGENZA ═══════════════ */
+function getUrgenzaScore(r){
+  const d = r['Data prossima azione'];
+  const oggi = new Date(); oggi.setHours(0,0,0,0);
+  if(!d) return 9999; // senza data → in fondo
+  const dd = new Date(d); dd.setHours(0,0,0,0);
+  return Math.round((dd - oggi) / 86400000); // negativo = scaduta
+}
+function urgenzaClass(score){
+  if(score < 0)  return 'ur-scaduta';
+  if(score <= 3) return 'ur-urgente';
+  if(score < 9999) return 'ur-ok';
+  return 'ur-nessuna';
+}
+function urgenzaLabel(score){
+  if(score < 0)    return `SCADUTA ${Math.abs(score)}gg fa`;
+  if(score === 0)  return 'OGGI';
+  if(score === 1)  return 'DOMANI';
+  if(score <= 3)   return `TRA ${score} GG`;
+  if(score < 9999) return `TRA ${score} GG`;
+  return 'SENZA DATA';
+}
+function renderUrgenzaList(){
+  const container = document.getElementById('urgenzaList');
+  if(!container) return;
+  const rows = getRecords()
+    .filter(r => !/sospeso|da non contattare|archivio/i.test(r.Categoria||''))
+    .map(r => ({...r, _score: getUrgenzaScore(r)}))
+    .sort((a,b) => a._score - b._score)
+    .slice(0, 10); // top 10 priorità
+
+  if(!rows.length){
+    container.innerHTML = '<div class="urgenza-empty">Nessun record operativo. Aggiungi lead dal database.</div>';
+    return;
+  }
+  container.innerHTML = rows.map(r => {
+    const cls = urgenzaClass(r._score);
+    const lbl = urgenzaLabel(r._score);
+    const titolo = esc(r['Titolo / Asset'] || r.ID || '—');
+    const zona = esc(r.Zona || '');
+    const stato = esc(r['Stato / Prossima azione'] || '');
+    const cat = esc(r.Categoria || '');
+    return `<div class="urgenza-row ${cls}" onclick="openDbPage('${cat}')">
+      <span class="ur-badge">${lbl}</span>
+      <div><div class="ur-titolo">${titolo}</div><div class="ur-zona">${zona}${zona && cat ? ' · ' : ''}${cat}</div></div>
+      <div class="ur-stato">${stato}</div>
+      <span class="ur-arrow">→</span>
+    </div>`;
+  }).join('');
+}
+
 /* ═══════════════ NAVIGATION ═══════════════ */
 function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
 }
-function goHome(){ showPage('homePage'); updateKpis(); }
+function goHome(){ showPage('homePage'); updateKpis(); renderUrgenzaList(); }
 function openMethodPage(){ showPage('methodPage'); }
 function openRadarPage(){ showPage('radarPage'); renderRadar('tutti'); updateRadarTime(); }
 function openDbPage(filter='Tutti', openForm=false){
@@ -1233,6 +1309,7 @@ function setHeaderDate(){
 document.addEventListener('DOMContentLoaded',()=>{
   setHeaderDate();
   updateKpis();
+  renderUrgenzaList();
   requestNotificationPermission();
   startSheetWatch();
 
