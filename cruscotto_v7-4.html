@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logo Immobiliare — Cruscotto Commerciale Operativo Torino · v7-4</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0F0C08;--cream:#F7F2EA;--gold:#C9A84C;--gold-light:#E2C97E;
+  --gold-dark:#8B6914;--warm:#7A6F62;--border:#D8CDB8;--card:#FDFAF4;
+  --red:#8B1A1A;--red-s:#FAE8E4;--yel-s:#FAF4E0;--grn:#2D5A27;--grn-s:#E4F0E8;
+  --blu-s:#E4EDF5;--teal:#1A4A4A;--orange:#7A3B0A;--orange-s:#FDF0E0;
+}
+body{background:var(--cream);color:var(--ink);font-family:'DM Mono',monospace;font-size:13px;line-height:1.65}
+.header{background:var(--ink);border-bottom:3px solid var(--gold);padding:30px 48px}
+.header-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.brand{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;color:var(--cream);letter-spacing:.06em}
+.brand span{color:var(--gold)}
+.brand-sub{font-size:10px;color:var(--gold);letter-spacing:.25em;text-transform:uppercase;margin-top:3px}
+.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.date-badge{background:var(--gold);color:var(--ink);padding:6px 14px;border-radius:2px;font-size:11px;letter-spacing:.08em;white-space:nowrap}
+.header-desc{font-size:12px;color:#8A8070;line-height:1.7;max-width:850px}
+.main{max-width:1240px;margin:0 auto;padding:42px 32px}
+.page{display:none}
+.page.active{display:block}
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:28px}
+.kpi{background:var(--card);border:1px solid var(--border);padding:18px 20px;position:relative;overflow:hidden;min-height:105px}
+.kpi::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--gold)}
+.kpi:hover{cursor:pointer;box-shadow:0 4px 20px rgba(15,12,8,.10);transform:translateY(-1px);transition:all .18s ease}
+.kpi-n{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;line-height:1}
+.kpi-l{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--warm);margin-top:5px}
+.kpi-hint{font-size:10px;color:var(--gold-dark);margin-top:8px}
+.section{margin-bottom:42px}
+.sec-label{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold-dark);margin-bottom:5px}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:400;margin-bottom:3px}
+.sec-divider{height:1px;background:linear-gradient(90deg,var(--gold),transparent);margin-bottom:24px}
+.card{background:var(--card);border:1px solid var(--border);padding:22px 24px;margin-bottom:14px}
+.card-title{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dark);margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.card-big{font-family:'Cormorant Garamond',serif;font-size:25px;line-height:1.2;margin-bottom:7px}
+.card-desc{font-size:11px;color:var(--warm);line-height:1.7}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.btn{background:var(--ink);color:var(--gold);border:1px solid var(--gold);padding:8px 12px;font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;text-decoration:none;display:inline-block}
+.btn.light{background:var(--card);color:var(--ink);border:1px solid var(--border)}
+.btn.radar-btn{background:transparent;color:var(--gold);border:1px solid var(--gold);position:relative}
+.btn:hover{filter:brightness(.95);transform:translateY(-1px)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 18px}
+.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.upload-box{background:var(--ink);border-left:4px solid var(--gold);padding:16px 18px;color:var(--cream)}
+.upload-box h3{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--gold);margin-bottom:6px}
+.upload-box p{font-size:11px;color:#8A8070;line-height:1.65;margin-bottom:10px}
+.upload-box input{display:block;width:100%;padding:8px;background:var(--cream);color:var(--ink);border:1px solid var(--gold);font-family:'DM Mono',monospace;font-size:11px}
+table{width:100%;border-collapse:collapse;font-size:12px;background:var(--card);border:1px solid var(--border)}
+th{text-align:left;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--warm);padding:9px 10px;border-bottom:1px solid var(--border)}
+td{padding:10px;border-bottom:1px solid #EDE7D8;vertical-align:top}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px}
+.bc{background:var(--red-s);color:var(--red)}.bt{background:var(--yel-s);color:#7A5A00}.bf{background:var(--blu-s);color:#1A3A5C}.bg{background:var(--grn-s);color:var(--grn)}
+.open-link-btn{background:var(--ink);color:var(--gold);padding:3px 8px;border:1px solid var(--gold);text-decoration:none;font-size:10px;display:inline-block}
+.table-wrap{overflow-x:auto}
+.form{display:none;background:var(--cream);border:1px solid var(--border);padding:16px;margin:14px 0}
+.form.open{display:block}
+.form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.field label{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--warm);margin-bottom:4px}
+.field input,.field select,.field textarea{width:100%;padding:8px;border:1px solid var(--border);background:#fff;font-family:'DM Mono',monospace;font-size:11px;color:var(--ink)}
+.field textarea{min-height:72px;resize:vertical}
+.field.full{grid-column:1/-1}
+.index-note{background:var(--ink);border-left:4px solid var(--gold);padding:16px 20px;color:#8A8070;font-size:11px;line-height:1.7;margin-bottom:28px}
+.index-note strong{color:var(--gold)}
+.today-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px}
+.today-card{background:var(--card);border:1px solid var(--border);padding:16px 18px;position:relative}
+.today-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--gold)}
+.today-n{font-family:'Cormorant Garamond',serif;font-size:34px;line-height:1;font-weight:300}
+.today-l{font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--warm);margin-top:5px}
+.footer{background:var(--ink);padding:24px 48px;margin-top:48px;display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--gold)}
+.footer-left{font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--cream)}
+.footer-right{font-size:10px;color:#8A8070;text-align:right;line-height:1.8}
+
+/* PAGINA METODO */
+.method-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.method-card{background:var(--card);border:1px solid var(--border);padding:20px 22px;position:relative}
+.method-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--gold)}
+.method-title{font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:400;margin-bottom:6px}
+.method-sub{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dark);margin-bottom:10px}
+.method-desc{font-size:11px;color:var(--warm);line-height:1.7}
+.method-list{margin-top:8px;padding-left:18px;color:var(--warm);font-size:11px;line-height:1.7}
+.method-list li{margin-bottom:4px}
+.method-flow{background:var(--ink);border-left:4px solid var(--gold);padding:16px 20px;color:#8A8070;font-size:11px;line-height:1.8;margin-bottom:18px}
+.method-flow strong{color:var(--gold)}
+
+/* ── NUOVO: Notification badge ── */
+.notif-wrap{position:relative;display:inline-block}
+.notif-badge{
+  background:var(--red);color:#fff;border-radius:50%;
+  width:18px;height:18px;display:inline-flex;align-items:center;
+  justify-content:center;font-size:9px;font-family:'DM Mono',monospace;
+  position:absolute;top:-7px;right:-7px;
+  animation:nbpulse .9s ease infinite alternate;
+  pointer-events:none;
+}
+.notif-badge.hidden{display:none}
+@keyframes nbpulse{from{opacity:1;transform:scale(1)}to{opacity:.55;transform:scale(.85)}}
+
+/* ── NUOVO: CSV Watcher ── */
+.watcher-panel{
+  background:var(--ink);border:1px solid var(--gold);
+  padding:20px 24px;margin-bottom:20px;
+}
+.watcher-panel h3{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold);margin-bottom:6px;font-weight:400}
+.watcher-panel p{font-size:11px;color:#8A8070;line-height:1.7;margin-bottom:12px}
+.watcher-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.watcher-status{font-size:11px;color:#8A8070;margin-top:10px;line-height:1.6}
+.watcher-status.active{color:var(--gold)}
+.watcher-dot{
+  width:8px;height:8px;border-radius:50%;background:#555;
+  display:inline-block;margin-right:6px;vertical-align:middle;
+}
+.watcher-dot.on{background:var(--gold);animation:nbpulse .9s ease infinite alternate}
+.new-lead-flash{
+  display:inline-block;background:var(--red);color:#fff;
+  padding:2px 8px;border-radius:2px;font-size:10px;margin-left:8px;
+  animation:nbpulse .9s ease infinite alternate;
+}
+.new-lead-flash.hidden{display:none}
+
+/* ── NUOVO: Radar page ── */
+.radar-status{
+  display:flex;align-items:center;gap:14px;
+  background:var(--ink);border-left:4px solid var(--gold);
+  padding:14px 20px;margin-bottom:20px;font-size:11px;color:#8A8070;
+  flex-wrap:wrap;
+}
+.pulse-dot{
+  width:9px;height:9px;border-radius:50%;background:var(--gold);
+  animation:pdot 1.6s ease infinite;flex-shrink:0;
+}
+@keyframes pdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.65)}}
+.radar-last{color:var(--gold-light)}
+
+.radar-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.radar-tab{
+  background:var(--card);border:1px solid var(--border);
+  padding:7px 16px;font-family:'DM Mono',monospace;
+  font-size:10px;letter-spacing:.07em;cursor:pointer;color:var(--warm);
+  transition:all .14s;
+}
+.radar-tab.active,.radar-tab:hover{background:var(--ink);color:var(--gold);border-color:var(--gold)}
+
+.radar-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.radar-card{
+  background:var(--card);border:1px solid var(--border);
+  padding:18px 20px;position:relative;transition:all .18s ease;
+}
+.radar-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%}
+.radar-card[data-cat="aste"]::before{background:#C0392B}
+.radar-card[data-cat="annunci"]::before{background:var(--gold)}
+.radar-card[data-cat="social"]::before{background:#2471A3}
+.radar-card[data-cat="istituzionale"]::before{background:var(--grn)}
+.radar-card[data-cat="segnali"]::before{background:#7D3C98}
+.radar-card:hover{box-shadow:0 4px 20px rgba(15,12,8,.12);transform:translateY(-2px)}
+.radar-cat-label{font-size:9px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:7px;font-weight:500}
+.radar-card[data-cat="aste"] .radar-cat-label{color:#C0392B}
+.radar-card[data-cat="annunci"] .radar-cat-label{color:var(--gold-dark)}
+.radar-card[data-cat="social"] .radar-cat-label{color:#2471A3}
+.radar-card[data-cat="istituzionale"] .radar-cat-label{color:var(--grn)}
+.radar-card[data-cat="segnali"] .radar-cat-label{color:#7D3C98}
+.radar-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;margin-bottom:6px;line-height:1.2}
+.radar-desc{font-size:11px;color:var(--warm);line-height:1.65;margin-bottom:10px}
+.radar-tip{
+  font-size:10px;color:var(--gold-dark);
+  border-top:1px solid var(--border);padding-top:8px;
+  line-height:1.5;
+}
+.radar-tip::before{content:'→ ';color:var(--gold)}
+.radar-actions{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+
+/* ── NUOVO: Modal Analisi Lead ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,12,8,.82);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s ease}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--card);border:1px solid var(--gold);width:min(680px,95vw);max-height:88vh;overflow-y:auto;position:relative;animation:modalIn .22s ease}
+@keyframes modalIn{from{transform:translateY(18px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-header{background:var(--ink);border-bottom:2px solid var(--gold);padding:18px 24px;display:flex;justify-content:space-between;align-items:center}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold);font-weight:400}
+.modal-close{background:none;border:none;color:var(--warm);font-size:20px;cursor:pointer;padding:4px 8px}
+.modal-close:hover{color:var(--gold)}
+.modal-body{padding:22px 24px}
+.score-block{display:flex;align-items:center;gap:16px;background:var(--ink);border-left:4px solid var(--gold);padding:14px 20px;margin-bottom:18px}
+.score-letter{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:300;line-height:1}
+.score-A{color:#4CAF50}.score-B{color:var(--gold)}.score-C{color:var(--warm)}
+.score-info{flex:1}
+.score-label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#8A8070;margin-bottom:4px}
+.score-motivo{font-size:12px;color:var(--cream);line-height:1.5}
+.analysis-section{margin-bottom:16px}
+.analysis-label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dark);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.analysis-text{font-size:12px;color:var(--ink);line-height:1.7;background:#fff;border:1px solid var(--border);padding:12px 14px;white-space:pre-wrap;font-family:'DM Mono',monospace}
+.copy-btn{background:var(--ink);color:var(--gold);border:1px solid var(--gold);padding:5px 10px;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;margin-top:6px;display:inline-block}
+.copy-btn:hover{filter:brightness(1.15)}
+.copy-btn.copied{background:var(--grn);border-color:var(--grn);color:#fff}
+.modal-loading{text-align:center;padding:40px;font-size:12px;color:var(--warm)}
+.modal-error{background:var(--red-s);border-left:3px solid var(--red);padding:14px 18px;color:var(--red);font-size:12px;line-height:1.6}
+.analyze-btn{background:var(--teal);color:var(--gold-light);border:1px solid var(--gold);padding:3px 8px;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;white-space:nowrap}
+.analyze-btn:hover{filter:brightness(1.2)}
+
+/* ── NUOVO: Link Quality Badges ── */
+.lq{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:2px;font-size:9px;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap;font-weight:500}
+.lq-good{background:var(--grn-s);color:var(--grn)}
+.lq-generic{background:var(--yel-s);color:#7A5A00}
+.lq-missing{background:var(--red-s);color:var(--red)}
+.lq-unknown{background:var(--blu-s);color:#1A3A5C}
+.lq-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.lq-good .lq-dot{background:var(--grn)}
+.lq-generic .lq-dot{background:#C9A000}
+.lq-missing .lq-dot{background:var(--red)}
+.lq-unknown .lq-dot{background:#2471A3}
+.link-cell{display:flex;flex-direction:column;gap:5px}
+.alt-search-btn{background:transparent;color:var(--gold-dark);border:1px solid var(--border);padding:2px 7px;font-family:'DM Mono',monospace;font-size:9px;cursor:pointer;text-decoration:none;display:inline-block;white-space:nowrap}
+.alt-search-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+@media(max-width:900px){
+  .kpi-row,.today-grid{grid-template-columns:repeat(2,1fr)}
+  .g2,.g3,.upload-grid,.form-grid,.method-grid,.radar-grid{grid-template-columns:1fr}
+  .header{padding:22px}
+  .main{padding:24px 16px}
+  .footer{display:block}
+  .footer-right{text-align:left;margin-top:10px}
+  .radar-status{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-top">
+    <div>
+      <div class="brand">Logo <span>Immobiliare</span></div>
+      <div class="brand-sub">Cruscotto commerciale operativo · Torino · v7-4</div>
+    </div>
+    <div class="header-right">
+      <div class="date-badge" id="headerDate">Aggiornamento in corso…</div>
+      <div class="notif-wrap">
+        <button class="btn radar-btn" onclick="openRadarPage()" style="font-size:10px;letter-spacing:.08em">
+          ◎ RADAR ATTIVO
+        </button>
+        <span class="notif-badge hidden" id="globalNotifBadge">0</span>
+      </div>
+    </div>
+  </div>
+  <div class="header-desc">
+    Home pulita come indice. Clicca un KPI per aprire la pagina operativa dedicata.
+    <strong style="color:var(--gold)">Radar Fonti Terze</strong> attivo: 22 fonti terze categorizzate.
+    CSV Auto-Watch disponibile nel database — connetti il tuo file e si aggiorna da solo ogni 5 minuti.
+  </div>
+</header>
+
+<main class="main">
+
+<!-- ═══════════════ HOME PAGE ═══════════════ -->
+<section id="homePage" class="page active">
+  <div class="index-note">
+    <strong>Regola di lavoro:</strong> archivio completo = memoria totale. Cruscotto 8 colonne = lavoro quotidiano.
+    Ogni KPI apre una pagina operativa dedicata. Il <strong>Radar</strong> monitora 22 fonti terze esterne ai portali.
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi" onclick="openDbPage('Lead puliti')">
+      <div class="kpi-n" id="kpiLeadPuliti">0</div>
+      <div class="kpi-l">Lead puliti</div>
+      <div class="kpi-hint">Apri database lead</div>
+    </div>
+    <div class="kpi" onclick="openDbPage('Link OK / Operativi')">
+      <div class="kpi-n" id="kpiLinkOk">0</div>
+      <div class="kpi-l">Link OK / Operativi</div>
+      <div class="kpi-hint">Apri link pronti</div>
+    </div>
+    <div class="kpi" onclick="openDbPage('Link da sistemare')">
+      <div class="kpi-n" id="kpiLinkDaSistemare">0</div>
+      <div class="kpi-l">Link da sistemare</div>
+      <div class="kpi-hint">Completa URL diretti</div>
+    </div>
+    <div class="kpi" onclick="openDbPage('Lista chiamate')">
+      <div class="kpi-n" id="kpiListaChiamate">0</div>
+      <div class="kpi-l">Lista chiamate pronta</div>
+      <div class="kpi-hint">Apri chiamate</div>
+    </div>
+    <div class="kpi" onclick="openDbPage('Follow-up')">
+      <div class="kpi-n" id="kpiFollowUp">0</div>
+      <div class="kpi-l">Lead per follow-up</div>
+      <div class="kpi-hint">Apri follow-up</div>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="sec-label">Operatività immediata</div>
+    <div class="sec-title">Da fare oggi</div>
+    <div class="sec-divider"></div>
+    <div class="today-grid">
+      <div class="today-card"><div class="today-n" id="todayOpenLinks">0</div><div class="today-l">Link da aprire</div></div>
+      <div class="today-card"><div class="today-n" id="todayVerifyPhone">0</div><div class="today-l">Telefoni da verificare</div></div>
+      <div class="today-card"><div class="today-n" id="todayCall">0</div><div class="today-l">Da chiamare</div></div>
+      <div class="today-card"><div class="today-n" id="todayFollow">0</div><div class="today-l">Follow-up</div></div>
+      <div class="today-card"><div class="today-n" id="todayHot">0</div><div class="today-l">Contatti caldi</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Azioni rapide</div>
+      <div class="toolbar">
+        <button class="btn" onclick="openDbPage('Link da sistemare')">Apri link da sistemare</button>
+        <button class="btn" onclick="openDbPage('Link OK / Operativi')">Verifica contatti</button>
+        <button class="btn" onclick="openDbPage('Lista chiamate')">Lista chiamate</button>
+        <button class="btn" onclick="openDbPage('Follow-up')">Follow-up</button>
+        <button class="btn light" onclick="openDbPage('Tutti', true)">+ Nuovo contatto veloce</button>
+        <button class="btn light" onclick="openMethodPage()">Metodo operativo</button>
+        <div class="notif-wrap">
+          <button class="btn" onclick="openRadarPage()" style="background:var(--teal);border-color:var(--gold)">◎ Apri Radar Fonti Terze</button>
+          <span class="notif-badge hidden" id="homeRadarBadge">0</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="card">
+    <div class="card-title">Metodo operativo e agenti AI</div>
+    <div class="card-big">Regole sempre disponibili</div>
+    <div class="card-desc">
+      Apri questa pagina per vedere struttura agenti AI, fonti non immobiliari, regole privacy/no agenzie,
+      follow-up ogni 5 lead e checklist giornaliera.
+    </div>
+    <div class="toolbar">
+      <button class="btn" onclick="openMethodPage()">Apri metodo operativo</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ DATABASE PAGE ═══════════════ -->
+<section id="dbPage" class="page">
+  <div class="toolbar">
+    <button class="btn light" onclick="goHome()">← Torna all'indice</button>
+    <button class="btn light" onclick="openMethodPage()">Metodo operativo</button>
+    <button class="btn light" onclick="openRadarPage()">◎ Radar</button>
+    <button class="btn" onclick="openDbPage('Tutti')">Tutti</button>
+    <button class="btn light" onclick="openDbPage('Lead puliti')">Lead puliti</button>
+    <button class="btn light" onclick="openDbPage('Link OK / Operativi')">Link OK</button>
+    <button class="btn light" onclick="openDbPage('Link da sistemare')">Link da sistemare</button>
+    <button class="btn light" onclick="openDbPage('Lista chiamate')">Lista chiamate</button>
+    <button class="btn light" onclick="openDbPage('Follow-up')">Follow-up</button>
+  </div>
+
+  <section class="section">
+    <div class="sec-label">Pagina operativa</div>
+    <div class="sec-title" id="dbPageTitle">Database operativo</div>
+    <div class="sec-divider"></div>
+
+    <!-- ── CSV AUTO-WATCHER ── -->
+    <div class="watcher-panel">
+      <h3>Google Sheets Live
+        <span class="new-lead-flash hidden" id="newLeadFlash">NUOVI LEAD!</span>
+      </h3>
+      <p>
+        Connesso al tuo <strong style="color:var(--gold)">Google Sheet live</strong> — il cruscotto si aggiorna automaticamente ogni <strong style="color:var(--gold)">5 minuti</strong>.
+        I lead aggiunti dallo script RSS appaiono qui senza fare nulla.
+      </p>
+      <div class="watcher-row">
+        <button class="btn" id="refreshCsvBtn" onclick="fetchGoogleSheet()">↻ Aggiorna ora</button>
+        <button class="btn light" onclick="toggleManualUpload()">Carica CSV manuale</button>
+      </div>
+      <div class="watcher-status active" id="watcherStatus">
+        <span class="watcher-dot on" id="watcherDot"></span>
+        Google Sheets connesso · Aggiornamento automatico ogni 5 minuti · Ultimo check: <span id="watcherTime">mai</span>
+      </div>
+    </div>
+
+    <div class="upload-grid" style="display:none">
+      <div class="upload-box">
+        <h3>Carica cruscotto CSV</h3>
+        <p>Carica manualmente il CSV a 8 colonne. Aggiorna database e KPI principali.</p>
+        <input type="file" id="slimDashboardCsv" accept=".csv">
+      </div>
+      <div class="upload-box">
+        <h3>Carica Registro Conversazioni CSV</h3>
+        <p>Carica conversazioni reali: telefonate, WhatsApp, email, portale, social, appuntamenti.</p>
+        <input type="file" id="conversationCsvInline" accept=".csv">
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn" onclick="toggleForm()">+ Aggiungi record</button>
+      <button class="btn light" onclick="exportCruscottoCsv()">Esporta cruscotto CSV</button>
+      <button class="btn light" onclick="exportConversazioniCsv()">Esporta conversazioni CSV</button>
+      <button class="btn light" onclick="clearManual()">Svuota dati manuali</button>
+    </div>
+
+    <div class="form" id="recordForm">
+      <div class="card-title">Nuovo contatto / lead veloce</div>
+      <div class="form-grid">
+        <div class="field"><label>ID</label><input id="fId" placeholder="TO-___"></div>
+        <div class="field"><label>Categoria</label><select id="fCategoria">
+          <option>Lead puliti</option><option>Link OK / Operativi</option><option>Link da sistemare</option><option>Lista chiamate</option><option>Follow-up</option><option>Contatti attivati</option><option>Buyer</option><option>Watchlist</option><option>Scartato</option>
+        </select></div>
+        <div class="field"><label>Divisione</label><select id="fDivisione">
+          <option>Acquisizione incarichi</option><option>Property Finder</option><option>Buyer ITA/EST</option><option>Watchlist</option><option>Registro conversazioni</option>
+        </select></div>
+        <div class="field"><label>Zona</label><input id="fZona" placeholder="Crocetta, Centro..."></div>
+        <div class="field"><label>Titolo / Asset</label><input id="fTitolo" placeholder="Immobile, buyer, segnale..."></div>
+        <div class="field"><label>Canale / Contatto</label><input id="fCanale" placeholder="Telefono, portale, social..."></div>
+        <div class="field full"><label>Link diretto</label><input id="fLink" placeholder="https://..."></div>
+        <div class="field full"><label>Stato / Prossima azione</label><textarea id="fStato" placeholder="Chiamare, verificare telefono, follow-up, appuntamento..."></textarea></div>
+      </div>
+      <div class="toolbar">
+        <button class="btn" onclick="saveRecord()">Salva record</button>
+        <button class="btn light" onclick="toggleForm(false)">Annulla</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Categoria</th><th>Divisione</th><th>Zona</th><th>Titolo / Asset</th><th>Link diretto</th><th>Canale / Contatto</th><th>Stato / Prossima azione</th></tr></thead>
+        <tbody id="dbBody"></tbody>
+      </table>
+    </div>
+  </section>
+</section>
+
+<!-- ═══════════════ METHOD PAGE ═══════════════ -->
+<section id="methodPage" class="page">
+  <div class="toolbar">
+    <button class="btn light" onclick="goHome()">← Torna all'indice</button>
+    <button class="btn" onclick="openDbPage('Tutti')">Apri database operativo</button>
+    <button class="btn light" onclick="openRadarPage()">◎ Radar Fonti Terze</button>
+  </div>
+
+  <section class="section">
+    <div class="sec-label">Metodo operativo</div>
+    <div class="sec-title">Regole, fonti e agenti AI</div>
+    <div class="sec-divider"></div>
+
+    <div class="card" id="agenti-ai">
+      <div class="card-title">Agenti AI — struttura completa</div>
+      <div class="card-big">Chi fa cosa nel sistema</div>
+      <div class="card-desc">
+        Gli agenti AI sono il metodo operativo del progetto: ognuno ha un compito preciso per trasformare fonti e segnali in contatti lavorabili.
+      </div>
+      <table style="margin-top:14px">
+        <thead>
+          <tr><th>Agente</th><th>Funzione pratica</th><th>Output</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Lead Researcher</strong></td><td>Cerca opportunità da portali, social, aste, news e fonti non immobiliari.</td><td>Nuovo lead/segnale con link o fonte verificabile.</td></tr>
+          <tr><td><strong>Direct Link Hunter</strong></td><td>Trasforma risultati generici in URL diretti alla scheda, post, bando o articolo.</td><td>Link diretto pronto da aprire.</td></tr>
+          <tr><td><strong>Source Intelligence Agent</strong></td><td>Trova segnali fuori dai portali: Comune, news, LinkedIn, aste, social, forum expat.</td><td>Segnale classificato come lead, buyer, property finder o watchlist.</td></tr>
+          <tr><td><strong>Contact Verifier</strong></td><td>Indica cosa verificare: telefono, form, referente, pulsante "vedi telefono".</td><td>Contatto/canale verificabile per Giamma.</td></tr>
+          <tr><td><strong>Data Cleaner / Compliance</strong></td><td>Pulisce duplicati, separa categorie, gestisce no agenzie e "da non contattare".</td><td>CRM pulito e sicuro.</td></tr>
+          <tr><td><strong>Market Analyst</strong></td><td>Prepara gancio commerciale su zona, valore, prezzo e comparabili.</td><td>Motivo concreto per cui il proprietario dovrebbe ascoltarci.</td></tr>
+          <tr><td><strong>Buyer Finder</strong></td><td>Cerca buyer italiani/esteri concreti, non richieste vaghe.</td><td>Buyer abbinabile o da qualificare.</td></tr>
+          <tr><td><strong>Reporting Manager</strong></td><td>Prepara follow-up ogni 5 nuovi lead e file aggiornati.</td><td>Email + archivio + CSV + HTML aggiornati.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="method-flow">
+      <strong>Flusso madre:</strong>
+      Fonte / segnale → link diretto → verifica contatto → classificazione → azione commerciale → registro conversazione → follow-up.
+      Se un elemento non aiuta a trovare un contatto o risparmiare tempo, resta nell'archivio completo e non sporca il cruscotto.
+    </div>
+
+    <div class="method-grid">
+      <div class="method-card">
+        <div class="method-title">Archivio vs Cruscotto</div>
+        <div class="method-sub">Due livelli separati</div>
+        <div class="method-desc">L'archivio completo conserva tutta la memoria storica. Il cruscotto operativo mostra solo 8 colonne per lavorare veloce.</div>
+        <ul class="method-list">
+          <li><strong>Archivio completo:</strong> dettagli, note, compliance, storico, market analyst.</li>
+          <li><strong>Cruscotto:</strong> ID, categoria, divisione, zona, titolo, link, canale, prossima azione.</li>
+          <li><strong>HTML:</strong> indice pulito + pagine operative.</li>
+        </ul>
+      </div>
+      <div class="method-card">
+        <div class="method-title">Link Diretto First</div>
+        <div class="method-sub">Regola principale</div>
+        <div class="method-desc">Un'opportunità diventa lavorabile solo se ha un link diretto o una fonte verificabile.</div>
+        <ul class="method-list">
+          <li>Prima link diretto.</li>
+          <li>Poi verifica telefono/email/canale.</li>
+          <li>Poi chiamata o follow-up.</li>
+          <li>Se manca la fonte, il record resta sospeso o watchlist.</li>
+        </ul>
+      </div>
+      <div class="method-card">
+        <div class="method-title">Portali vs Fonti non immobiliari</div>
+        <div class="method-sub">Lead diretti e segnali</div>
+        <div class="method-desc">I portali immobiliari generano lead diretti. Le fonti non immobiliari generano segnali da validare.</div>
+        <ul class="method-list">
+          <li><strong>Non immobiliari:</strong> news, Comune, aste, LinkedIn, social, forum expat, siti aziendali.</li>
+          <li><strong>Regola:</strong> segnale → fonte verificabile → referente/azione → lead operativo.</li>
+        </ul>
+      </div>
+      <div class="method-card">
+        <div class="method-title">Contatti Attivati</div>
+        <div class="method-sub">Conversazioni reali</div>
+        <div class="method-desc">Non tutti i lead diventano contatti. Il registro conversazioni contiene solo persone con cui c'è stata vera interazione.</div>
+        <ul class="method-list">
+          <li>Annuncio trovato = opportunità.</li>
+          <li>Chiamata senza risposta = tentativo.</li>
+          <li>Risposta ricevuta = contatto attivato.</li>
+          <li>Appuntamento fissato = pipeline commerciale.</li>
+        </ul>
+      </div>
+      <div class="method-card">
+        <div class="method-title">No agenzie e privacy</div>
+        <div class="method-sub">Approccio soft</div>
+        <div class="method-desc">I contatti vanno gestiti con attenzione. Telefono/email solo se pubblici nella fonte o forniti dalla persona.</div>
+        <ul class="method-list">
+          <li>No agenzie: massimo 1 contatto + 1 follow-up soft.</li>
+          <li>Se rifiuta: stato "Da non contattare".</li>
+          <li>Nessuno scraping aggressivo o dati personali fuori fonte.</li>
+        </ul>
+      </div>
+      <div class="method-card">
+        <div class="method-title">Follow-up ogni 5 lead</div>
+        <div class="method-sub">Regola Gmail</div>
+        <div class="method-desc">Ogni 5 nuovi lead qualificati, il sistema deve produrre riepilogo, file aggiornati e follow-up.</div>
+        <ul class="method-list">
+          <li>Invio solo a GIAMMARIABELLATO@GMAIL.COM.</li>
+          <li>Nessuna risposta ad altre email.</li>
+          <li>File aggiornati sempre forniti in chat.</li>
+        </ul>
+      </div>
+      <div class="method-card">
+        <div class="method-title">Checklist giornaliera</div>
+        <div class="method-sub">Uso pratico</div>
+        <div class="method-desc">Ogni sessione di lavoro deve iniziare dal cruscotto e chiudersi con export CSV.</div>
+        <ul class="method-list">
+          <li>Apri KPI più urgente.</li>
+          <li>Verifica 5/10 link.</li>
+          <li>Aggiungi contatti trovati.</li>
+          <li>Aggiorna stato/prossima azione.</li>
+          <li>Esporta CSV.</li>
+          <li>Reintegra nell'archivio completo.</li>
+        </ul>
+      </div>
+      <div class="method-card">
+        <div class="method-title">Radar Fonti Terze</div>
+        <div class="method-sub">Monitoraggio attivo</div>
+        <div class="method-desc">22 fonti esterne ai portali, categorizzate. Aprile ogni mattina per scansionare aste, social, annunci privati, segnali.</div>
+        <ul class="method-list">
+          <li>Aste giudiziarie → lead pre-asta.</li>
+          <li>Annunci privati → zero concorrenza agenzia.</li>
+          <li>Social & community → buyer e venditori diretti.</li>
+          <li>Istituzionale → segnali fuori mercato.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ═══════════════ RADAR PAGE ═══════════════ -->
+<section id="radarPage" class="page">
+  <div class="toolbar">
+    <button class="btn light" onclick="goHome()">← Torna all'indice</button>
+    <button class="btn light" onclick="openDbPage('Tutti')">Database operativo</button>
+    <button class="btn light" onclick="openMethodPage()">Metodo operativo</button>
+  </div>
+
+  <section class="section">
+    <div class="sec-label">Monitoraggio attivo · 22 fonti</div>
+    <div class="sec-title">Radar Fonti Terze — Torino</div>
+    <div class="sec-divider"></div>
+
+    <div class="radar-status">
+      <span class="pulse-dot"></span>
+      <span>Radar attivo · Sessione aperta · Ultimo check: <span class="radar-last" id="radarLastCheck">mai</span></span>
+      <span style="color:#555;font-size:10px">|</span>
+      <span style="font-size:10px;color:#8A8070">Apri le fonti ogni mattina prima delle chiamate. I portali arrivano dopo.</span>
+    </div>
+
+    <div class="index-note" style="margin-bottom:20px">
+      <strong>Strategia:</strong> queste fonti intercettano lead <strong>prima</strong> che arrivino sui portali immobiliari.
+      Aste = il proprietario vuole vendere prima dell'udienza. Privati = zero agenti concorrenti. Social = buyer che non sanno ancora di avere bisogno di te.
+    </div>
+
+    <div class="radar-tabs" id="radarTabs">
+      <button class="radar-tab active" onclick="filterRadar('tutti',this)">Tutti (22)</button>
+      <button class="radar-tab" onclick="filterRadar('aste',this)">Aste (4)</button>
+      <button class="radar-tab" onclick="filterRadar('annunci',this)">Annunci Privati (4)</button>
+      <button class="radar-tab" onclick="filterRadar('social',this)">Social &amp; Community (7)</button>
+      <button class="radar-tab" onclick="filterRadar('istituzionale',this)">Istituzionale (4)</button>
+      <button class="radar-tab" onclick="filterRadar('segnali',this)">Segnali (3)</button>
+    </div>
+
+    <div class="radar-grid" id="radarGrid"></div>
+  </section>
+</section>
+
+</main>
+
+<!-- ═══════════════ MODAL ANALISI LEAD ═══════════════ -->
+<div class="modal-overlay" id="analysisModal" onclick="closeModalOnBg(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Analisi Lead</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <div class="modal-loading">Analisi in corso<span id="loadingDots">...</span></div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-left">Logo Immobiliare · Cruscotto Commerciale Operativo Torino · v7-4</div>
+  <div class="footer-right">Giamma Bellato<br>GIAMMARIABELLATO@GMAIL.COM<br>125 lead · Radar 22 fonti · CSV Auto-Watch</div>
+</footer>
+
+<script>
+/* ═══════════════ SEED RECORDS ═══════════════ */
+const SEED_RECORDS = [];
+
+/* ═══════════════ RADAR SOURCES ═══════════════ */
+const RADAR_SOURCES = [
+  // ASTE
+  { cat:'aste', name:'Aste Online — Torino', desc:'Aste giudiziarie e fallimentari in Piemonte. Filtra per provincia Torino.', url:'https://www.asteonline.it/aste/immobili/?regione=piemonte', tip:'Il proprietario può ancora vendere prima dell\'udienza. Contatta il delegato.' },
+  { cat:'aste', name:'Aste Immobili', desc:'Portale specializzato aste. Schede con dati perizia e custode.', url:'https://www.asteimmobili.it/', tip:'Cerca per "Torino". Controlla date udienza e perizia tecnica disponibile.' },
+  { cat:'aste', name:'Portale Aste — Torino', desc:'Aggregatore ufficiale aste giudiziarie italiane. Sezione Piemonte/Torino.', url:'https://www.portaleaste.com/aste-giudiziarie/piemonte/', tip:'Lead premium: difficoltà finanziaria = motivazione alta a vendere subito.' },
+  { cat:'aste', name:'Aste Giudiziarie IT', desc:'Listino aste immobiliari con mappe e dettaglio lotti Torino.', url:'https://www.astegiudiziarie.it/vendita-immobili/torino/', tip:'Sempre verificare se il proprietario è contattabile prima dell\'udienza.' },
+
+  // ANNUNCI PRIVATI
+  { cat:'annunci', name:'Subito.it — Torino Immobili', desc:'Annunci privati. Filtra "da privati" per escludere completamente le agenzie.', url:'https://www.subito.it/annunci-piemonte/vendita/immobili/torino/', tip:'Priorità: annunci con numero visibile + foto genuine. Alta rotazione mattutina.' },
+  { cat:'annunci', name:'Bakeka — Case Torino', desc:'Classifieds privati. Alto tasso di venditori diretti con contatto diretto visibile.', url:'https://www.bakeca.it/annunci/vendita-case-appartamenti/torino/', tip:'Spesso contiene numeri diretti. Crocetta/Collina prioritaria.' },
+  { cat:'annunci', name:'Casa da Privato', desc:'Piattaforma 100% senza agenzie. Il venditore gestisce da solo = approccio soft.', url:'https://www.casadaprivato.it/vendita/case/torino/', tip:'Il proprietario non vuole agenti. Posizionati come consulente, non mediatore.' },
+  { cat:'annunci', name:'Wikicasa — Solo Privati', desc:'Aggregatore con filtro "da privato" attivabile. Torino e cintura.', url:'https://www.wikicasa.it/vendita-immobili/torino?tipo_contratto=vendita', tip:'Abbina con dati catasto per valutazione rapida da usare nel gancio.' },
+
+  // SOCIAL & COMMUNITY
+  { cat:'social', name:'FB: Vendo/Compro Casa Torino', desc:'Gruppo Facebook principale compravendita privata Torino. Alto volume post giornalieri.', url:'https://www.facebook.com/groups/vendocomprocasaatorino/', tip:'Monitora post "vendo" e "cerco". Commenta con valore prima di proporre.' },
+  { cat:'social', name:'FB: Case Torino e Provincia', desc:'Gruppo Facebook attivo con venditori e acquirenti locali verificati.', url:'https://www.facebook.com/groups/946456072043414/', tip:'Cerca post recenti: villa, bilocale, terrazzo, collina, Crocetta.' },
+  { cat:'social', name:'FB: Expats Turin', desc:'Comunità expat internazionale Torino. Buyer esteri e stranieri in città.', url:'https://www.facebook.com/groups/expatsturin/', tip:'Lead buyer qualificati: cercano agente di fiducia, non solo annunci.' },
+  { cat:'social', name:'FB Marketplace — Torino', desc:'Annunci immobiliari privati su Facebook Marketplace. Alta rotazione quotidiana.', url:'https://www.facebook.com/marketplace/torino/propertyforsale/', tip:'Controlla ogni giorno alle 9 e alle 17. Vantaggio: spesso senza prezzo fisso.' },
+  { cat:'social', name:'LinkedIn — Torino Property', desc:'HR manager, aziende, dirigenti: compratori/venditori per trasferimento lavoro.', url:'https://www.linkedin.com/search/results/people/?keywords=real+estate+torino', tip:'Target: profili trasferiti di recente o che valutano Torino. Approccio professionale.' },
+  { cat:'social', name:'Reddit — ItalyExpat Torino', desc:'Forum expat internazionale. Cercano consulenti locali di fiducia per comprare.', url:'https://www.reddit.com/r/ItalyExpat/search/?q=torino+house+buy', tip:'Rispondi con valore reale. Un commento utile = lead caldo diretto in DM.' },
+  { cat:'social', name:'Nextdoor Torino', desc:'Social di quartiere. Vendite di vicinato spesso non sui portali né sui social tradizionali.', url:'https://nextdoor.it/', tip:'Registrati come residente. Sezione "Attività di quartiere" = segnali precocissimi.' },
+
+  // ISTITUZIONALE
+  { cat:'istituzionale', name:'CCIAA Torino — Liquidazioni', desc:'Aziende in liquidazione = capannoni, uffici, magazzini da liquidare velocemente.', url:'https://www.to.camcom.it/registro-imprese', tip:'Cerca cessate attività + immobili strumentali. Il titolare vuole liquidare fast.' },
+  { cat:'istituzionale', name:'Tribunale Torino — Esecuzioni', desc:'Registro esecuzioni immobiliari pubbliche. Dati ufficiali aggiornati.', url:'https://tribunale.torino.giustizia.it/', tip:'Controlla sezione esecuzioni immobiliari. Fonte primaria per lead aste.' },
+  { cat:'istituzionale', name:'Comune Torino — Permessi Edilizi', desc:'Permessi di costruire e ristrutturare: chi investe oggi vende domani.', url:'https://www.comune.torino.it/sportelloedilizio/', tip:'Chi ristruttura in zone premium spesso cerca acquirente prima di finire i lavori.' },
+  { cat:'istituzionale', name:'Agenzia Entrate — Catasto', desc:'Variazioni catastali: eredità, donazioni, divorzi = immobili da vendere.', url:'https://www.agenziaentrate.gov.it/portale/web/guest/schede/catasto-e-cartografia/visura-catastale', tip:'Coordina con notai locali per intercettare successioni con immobili da vendere.' },
+
+  // SEGNALI
+  { cat:'segnali', name:'BritishExpats — Turin Forum', desc:'Forum expat britannici. Cercano professionisti locali affidabili a Torino.', url:'https://britishexpats.com/forum/italy-77/', tip:'Rispondi a thread "cerco agente Torino". Posizionati come esperto bilingue.' },
+  { cat:'segnali', name:'La Stampa — Torino', desc:'News locali Torino: sviluppi urbanistici, cantieri, zone in trasformazione.', url:'https://www.lastampa.it/torino/', tip:'Leggi news infrastrutture = zone con potenziale rialzo prezzi. Dati per il gancio.' },
+  { cat:'segnali', name:'Google Alerts — Setup Torino', desc:'Configura alert per "vendo casa Torino", "cerco casa Torino" e zone target.', url:'https://www.google.com/alerts', tip:'Alert quotidiani: "vendesi Crocetta", "vendo appartamento Torino privato", "villa collina Torino".' }
+];
+
+/* ═══════════════ CORE STATE ═══════════════ */
+const STORAGE_KEY = 'crmTorinoManualV4';
+let currentFilter = 'Tutti';
+let csvFileHandle = null;
+let csvWatchInterval = null;
+let lastCsvContent = '';
+let previousRecordCount = 0;
+let newLeadsCount = 0;
+
+/* ═══════════════ STORAGE HELPERS ═══════════════ */
+function getManual(){ try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')}catch(e){return []} }
+function setManual(rows){ localStorage.setItem(STORAGE_KEY, JSON.stringify(rows)); }
+function getRecords(){ return [...SEED_RECORDS, ...getManual()].map(normalizeRecord); }
+function esc(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
+function hasLink(r){return /^https?:\/\//i.test(r['Link diretto']||'');}
+function txt(r){return Object.values(r).join(' ').toLowerCase();}
+function setText(id,v){const el=document.getElementById(id); if(el) el.textContent=v;}
+
+function normalizeRecord(r){
+  return {
+    "ID": r["ID"] || r.id || "",
+    "Categoria": r["Categoria"] || r.categoria || "",
+    "Divisione": r["Divisione"] || r.divisione || "",
+    "Zona": r["Zona"] || r.zona || "",
+    "Titolo / Asset": r["Titolo / Asset"] || r.titolo || r["Asset / Titolo"] || "",
+    "Link diretto": r["Link diretto"] || r.link || r["Link diretto fonte"] || "",
+    "Canale / Contatto": r["Canale / Contatto"] || r.canale || r.contatto || "",
+    "Stato / Prossima azione": r["Stato / Prossima azione"] || r.stato || r.note || ""
+  };
+}
+
+/* ═══════════════ KPI ═══════════════ */
+function updateKpis(){
+  const rows=getRecords();
+  setText('kpiLeadPuliti', rows.filter(r=>/lead puliti/i.test(r.Categoria||'')).length || rows.length);
+  setText('kpiLinkOk', rows.filter(r=>/link ok|operativi|operativo/i.test((r.Categoria||'')+' '+(r['Stato / Prossima azione']||'')) || hasLink(r)).length);
+  setText('kpiLinkDaSistemare', rows.filter(r=>/link da sistemare|da sistemare/i.test((r.Categoria||'')+' '+(r['Stato / Prossima azione']||'')) || !hasLink(r)).length);
+  setText('kpiListaChiamate', rows.filter(r=>/lista chiamate|chiamabile|chiamare/i.test((r.Categoria||'')+' '+(r['Stato / Prossima azione']||''))).length);
+  setText('kpiFollowUp', rows.filter(r=>/follow|richiamare/i.test((r.Categoria||'')+' '+(r['Stato / Prossima azione']||''))).length);
+  setText('todayOpenLinks', rows.filter(r=>hasLink(r) && /link ok|operativ|verificare|aprire/.test(txt(r))).length);
+  setText('todayVerifyPhone', rows.filter(r=>/telefono|vedi telefono|verificare contatto/.test(txt(r))).length);
+  setText('todayCall', rows.filter(r=>/lista chiamate|chiamare|chiamabile/.test(txt(r))).length);
+  setText('todayFollow', rows.filter(r=>/follow|richiamare/.test(txt(r))).length);
+  setText('todayHot', rows.filter(r=>/caldo|interessato|appuntamento/.test(txt(r))).length);
+}
+
+/* ═══════════════ NAVIGATION ═══════════════ */
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goHome(){ showPage('homePage'); updateKpis(); }
+function openMethodPage(){ showPage('methodPage'); }
+function openRadarPage(){ showPage('radarPage'); renderRadar('tutti'); updateRadarTime(); }
+function openDbPage(filter='Tutti', openForm=false){
+  currentFilter=filter;
+  document.getElementById('dbPageTitle').textContent = filter==='Tutti' ? 'Database operativo — Tutti i record' : 'Database operativo — ' + filter;
+  showPage('dbPage');
+  renderDb();
+  if(openForm) toggleForm(true);
+}
+
+/* ═══════════════ DATABASE ═══════════════ */
+function filteredRecords(){
+  const rows=getRecords();
+  if(currentFilter==='Tutti') return rows;
+  const safe = currentFilter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const rx = new RegExp(safe, 'i');
+  return rows.filter(r =>
+    (currentFilter === 'Lead puliti')
+      ? r.Categoria === 'Lead puliti'
+      : rx.test(r.Categoria || '') || rx.test(r['Stato / Prossima azione'] || '')
+  );
+}
+/* ── Link quality detection (client-side, no fetch) ── */
+function getLinkQuality(url){
+  if(!url||url.trim()==='') return 'missing';
+  if(!/^https?:\/\//i.test(url)) return 'missing';
+  // Known specific URL patterns → direct link
+  if(/\/immobile\/\d+/i.test(url)) return 'good';       // Idealista scheda
+  if(/\/immobili\/\d+/i.test(url)) return 'good';       // Casa.it scheda
+  if(/\/Detail\//i.test(url)) return 'good';             // Aste detail
+  if(/\/posts\/\d+/i.test(url)) return 'good';          // FB post
+  if(/\/comments\/[a-z0-9]+/i.test(url)) return 'good'; // Reddit thread
+  if(/\/r\/[a-z]+\/comments\//i.test(url)) return 'good';
+  if(/printthread/i.test(url)) return 'good';            // Forum thread
+  if(/[?&]id=\d+/i.test(url)) return 'good';
+  // Generic patterns → not a direct link
+  if(/^https?:\/\/[^\/]+\/?$/.test(url)) return 'generic';          // just domain
+  if(/\/(vendita-case|vendita|affitto|immobili)\/?$/.test(url)) return 'generic';
+  if(/[?&](ordine|criterio|sortType|pag=|superfici)/i.test(url)) return 'generic';
+  if(/\/con-[a-z]/i.test(url)) return 'generic';        // Idealista filter page
+  if(/\/groups\/\d+\/?$/.test(url)) return 'generic';   // FB group homepage
+  if(/\/(vendita|affitto)\/[a-z-]+\/torino\/?$/i.test(url)) return 'generic';
+  return 'unknown';
+}
+function lqBadge(url){
+  const q=getLinkQuality(url);
+  const map={
+    good:   ['lq-good',   '● Diretto'],
+    generic:['lq-generic','● Generico'],
+    missing:['lq-missing','● Mancante'],
+    unknown:['lq-unknown','● Da verificare']
+  };
+  const [cls,label]=map[q]||map.unknown;
+  return `<span class="lq ${cls}"><span class="lq-dot"></span>${label.replace('● ','')}</span>`;
+}
+function altSearchUrl(r){
+  const q = [r['Titolo / Asset'],r['Zona'],'vendita Torino'].filter(Boolean).join(' ');
+  return 'https://www.google.com/search?q='+encodeURIComponent(q);
+}
+
+function renderDb(){
+  updateKpis();
+  const rows=filteredRecords();
+  const title=document.getElementById('dbPageTitle');
+  if(title) title.textContent = (currentFilter==='Tutti' ? 'Database operativo — Tutti i record' : 'Database operativo — ' + currentFilter) + ' (' + rows.length + ')';
+  const body=document.getElementById('dbBody');
+  if(!rows.length){body.innerHTML='<tr><td colspan="8" style="color:var(--warm)">Nessun record in questa vista.</td></tr>';return;}
+  body.innerHTML=rows.map(r=>{
+    const url=r['Link diretto']||'';
+    const q=getLinkQuality(url);
+    const openBtn=url ? `<a class="open-link-btn" href="${esc(url)}" target="_blank" rel="noopener">Apri →</a>` : '';
+    const altBtn=`<a class="alt-search-btn" href="${esc(altSearchUrl(r))}" target="_blank" rel="noopener" title="Cerca alternativa su Google">🔍 alternativa</a>`;
+    const linkCell=`<div class="link-cell">${lqBadge(url)}${openBtn}${(q==='generic'||q==='missing')? altBtn:''}</div>`;
+    const stato=esc(r['Stato / Prossima azione']||'Da verificare');
+    const id = esc(r.ID);
+    return `<tr><td>${id}</td><td>${esc(r.Categoria)}</td><td>${esc(r.Divisione)}</td><td>${esc(r.Zona)}</td><td>${esc(r['Titolo / Asset'])}</td><td>${linkCell}</td><td>${esc(r['Canale / Contatto'])}</td><td>${stato}<br><button class="analyze-btn" style="margin-top:6px" onclick="analyzeLeadWithAI(${JSON.stringify(r).replace(/"/g,'&quot;')})">⚡ Analizza</button></td></tr>`;
+  }).join('');
+}
+function toggleForm(force){
+  const f=document.getElementById('recordForm');
+  if(typeof force==='boolean') f.classList.toggle('open', force); else f.classList.toggle('open');
+}
+function saveRecord(){
+  const manual=getManual();
+  const rec={
+    "ID": document.getElementById('fId').value || 'MAN-' + String(manual.length+1).padStart(3,'0'),
+    "Categoria": document.getElementById('fCategoria').value,
+    "Divisione": document.getElementById('fDivisione').value,
+    "Zona": document.getElementById('fZona').value,
+    "Titolo / Asset": document.getElementById('fTitolo').value,
+    "Link diretto": document.getElementById('fLink').value,
+    "Canale / Contatto": document.getElementById('fCanale').value,
+    "Stato / Prossima azione": document.getElementById('fStato').value || 'Da verificare'
+  };
+  manual.push(rec); setManual(manual);
+  ['fId','fZona','fTitolo','fCanale','fLink','fStato'].forEach(id=>document.getElementById(id).value='');
+  toggleForm(false); renderDb();
+}
+
+/* ═══════════════ CSV IMPORT / EXPORT ═══════════════ */
+function parseCSV(text){
+  const rows=[]; let row=[], val='', q=false;
+  for(let i=0;i<text.length;i++){const c=text[i], n=text[i+1];
+    if(c==='"'&&q&&n==='"'){val+='"';i++;} else if(c==='"'){q=!q;}
+    else if(c===','&&!q){row.push(val);val='';}
+    else if((c==='\n'||c==='\r')&&!q){if(val||row.length){row.push(val);rows.push(row);row=[];val='';} if(c==='\r'&&n==='\n')i++;}
+    else val+=c;
+  }
+  if(val||row.length){row.push(val);rows.push(row);}
+  return rows.filter(r=>r.some(x=>(x||'').trim()));
+}
+function importCruscotto(text, isAutoWatch=false){
+  const rows=parseCSV(text); if(!rows.length)return;
+  const h=rows[0].map(x=>x.trim());
+  const existingIds = new Set(getManual().map(r=>r.ID));
+  const data=rows.slice(1).map((r,i)=>{
+    const obj={}; h.forEach((k,idx)=>obj[k]=(r[idx]||'').trim());
+    return {
+      "ID": obj.ID || obj.Id || obj.id || 'CSV-'+String(i+1).padStart(3,'0'),
+      "Categoria": obj.Categoria || 'Lead puliti',
+      "Divisione": obj.Divisione || '',
+      "Zona": obj.Zona || '',
+      "Titolo / Asset": obj['Titolo / Asset'] || obj.Titolo || obj.Asset || '',
+      "Link diretto": obj['Link diretto'] || obj.Link || '',
+      "Canale / Contatto": obj['Canale / Contatto'] || obj.Canale || obj.Contatto || '',
+      "Stato / Prossima azione": obj['Stato / Prossima azione'] || obj.Stato || obj['Prossima azione'] || 'Da verificare'
+    };
+  });
+  // REPLACE — non append: elimina duplicati alla radice
+  setManual(data);
+  const newIds = new Set(data.map(r=>r.ID));
+  const newCount = [...newIds].filter(id => !existingIds.has(id)).length;
+  if(isAutoWatch && newCount > 0){
+    newLeadsCount += newCount;
+    showNewLeadsNotification(newCount);
+  }
+  renderDb(); updateKpis();
+}
+function exportRows(rows, filename){
+  const h=["ID","Categoria","Divisione","Zona","Titolo / Asset","Link diretto","Canale / Contatto","Stato / Prossima azione"];
+  const csv=[h.join(',')].concat(rows.map(r=>h.map(k=>`"${String(r[k]||'').replace(/"/g,'""')}"`).join(','))).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); URL.revokeObjectURL(url);
+}
+function exportCruscottoCsv(){exportRows(getRecords(),'Cruscotto_Operativo_export.csv');}
+function exportConversazioniCsv(){exportRows(getRecords().filter(r=>/contatti attivati|follow|appuntamento|interessato/i.test((r.Categoria||'')+' '+(r['Stato / Prossima azione']||''))),'Registro_Conversazioni_export.csv');}
+function clearManual(){if(confirm('Svuotare solo i dati manuali/caricati in questo browser? I record pre-caricati restano.')){localStorage.removeItem(STORAGE_KEY); renderDb(); updateKpis();}}
+
+/* ═══════════════ GOOGLE SHEETS LIVE FEED ═══════════════ */
+const SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRYa0H65Rnq_TpeD2nSghMLAEnMe-KE1yNZ21epW9XvR03ZfmT-C2VVT8NvJ92hZh2Iu9uThKvIrPUu/pub?gid=1949401453&single=true&output=csv';
+let sheetFetchInterval = null;
+let lastSheetContent = '';
+let manualUploadVisible = false;
+
+async function fetchGoogleSheet(){
+  try {
+    const res = await fetch(SHEETS_CSV_URL + '&t=' + Date.now());
+    const text = await res.text();
+    if(text && text !== lastSheetContent){
+      const countBefore = getRecords().length;
+      lastSheetContent = text;
+      importCruscotto(text, false);
+      const countAfter = getRecords().length;
+      const nuovi = countAfter - countBefore;
+      if(nuovi > 0) showNewLeadsNotification(nuovi);
+    }
+    updateWatcherTime();
+  } catch(e) {
+    console.error('Errore fetch Google Sheet:', e);
+  }
+}
+
+function startSheetWatch(){
+  fetchGoogleSheet();
+  if(sheetFetchInterval) clearInterval(sheetFetchInterval);
+  sheetFetchInterval = setInterval(fetchGoogleSheet, 5 * 60 * 1000);
+}
+
+function updateWatcherTime(){
+  const el = document.getElementById('watcherTime');
+  if(el) el.textContent = new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+}
+
+function toggleManualUpload(){
+  manualUploadVisible = !manualUploadVisible;
+  const el = document.querySelector('.upload-grid');
+  if(el) el.style.display = manualUploadVisible ? 'grid' : 'none';
+}
+
+/* ═══════════════ HEADER DATE ═══════════════ */
+async function connectCsvFile(){
+  if(!window.showOpenFilePicker){
+    alert('Il tuo browser non supporta l\'accesso diretto ai file.\nUsa Chrome o Edge per questa funzione.\n\nPuoi comunque caricare il CSV manualmente dal pannello qui sotto.');
+    return;
+  }
+  try {
+    const [handle] = await window.showOpenFilePicker({
+      types:[{ description:'File CSV', accept:{'text/csv':['.csv']} }],
+      multiple: false
+    });
+    csvFileHandle = handle;
+    const file = await handle.getFile();
+    lastCsvContent = await file.text();
+    importCruscotto(lastCsvContent, false);
+    startCsvWatch();
+    setWatcherUI(true, file.name);
+  } catch(e) {
+    if(e.name !== 'AbortError') console.error('CSV connect error:', e);
+  }
+}
+function startCsvWatch(){
+  if(csvWatchInterval) clearInterval(csvWatchInterval);
+  csvWatchInterval = setInterval(refreshCsvNow, 5 * 60 * 1000);
+}
+async function refreshCsvNow(){
+  if(!csvFileHandle) return;
+  try {
+    const file = await csvFileHandle.getFile();
+    const text = await file.text();
+    if(text !== lastCsvContent){
+      lastCsvContent = text;
+      importCruscotto(text, true);
+      updateWatcherTime();
+    } else {
+      updateWatcherTime();
+    }
+  } catch(e) {
+    console.error('CSV refresh error:', e);
+    setWatcherUI(false, '');
+  }
+}
+function disconnectCsv(){
+  csvFileHandle = null;
+  lastCsvContent = '';
+  if(csvWatchInterval){ clearInterval(csvWatchInterval); csvWatchInterval = null; }
+  setWatcherUI(false, '');
+}
+function setWatcherUI(active, filename){
+  const dot = document.getElementById('watcherDot');
+  const status = document.getElementById('watcherStatus');
+  const connectBtn = document.getElementById('connectCsvBtn');
+  const disconnectBtn = document.getElementById('disconnectCsvBtn');
+  const refreshBtn = document.getElementById('refreshCsvBtn');
+  if(active){
+    dot.classList.add('on');
+    status.className = 'watcher-status active';
+    status.innerHTML = `<span class="watcher-dot on"></span>Monitoraggio attivo · File: <strong style="color:var(--gold)">${filename}</strong> · Aggiornamento automatico ogni 5 minuti`;
+    connectBtn.style.display = 'none';
+    disconnectBtn.style.display = 'inline-block';
+    refreshBtn.style.display = 'inline-block';
+  } else {
+    dot.classList.remove('on');
+    status.className = 'watcher-status inactive';
+    status.innerHTML = `<span class="watcher-dot"></span>Nessun file connesso · Usa "Connetti CSV locale" per avviare il monitoraggio automatico`;
+    connectBtn.style.display = 'inline-block';
+    disconnectBtn.style.display = 'none';
+    refreshBtn.style.display = 'none';
+  }
+}
+function updateWatcherTime(){
+  const now = new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  const status = document.getElementById('watcherStatus');
+  if(status && csvFileHandle){
+    const fname = status.querySelector('strong') ? status.querySelector('strong').textContent : '';
+    status.innerHTML = `<span class="watcher-dot on"></span>Monitoraggio attivo · File: <strong style="color:var(--gold)">${fname}</strong> · Ultimo check: <span style="color:var(--gold-light)">${now}</span>`;
+  }
+}
+
+/* ═══════════════ NOTIFICATIONS ═══════════════ */
+function showNewLeadsNotification(count){
+  // Badge in header
+  const badge = document.getElementById('globalNotifBadge');
+  const homeBadge = document.getElementById('homeRadarBadge');
+  const flash = document.getElementById('newLeadFlash');
+  if(badge){ badge.textContent = count; badge.classList.remove('hidden'); }
+  if(homeBadge){ homeBadge.textContent = count; homeBadge.classList.remove('hidden'); }
+  if(flash){ flash.classList.remove('hidden'); }
+  // Browser notification
+  if('Notification' in window && Notification.permission === 'granted'){
+    new Notification('Cruscotto Torino — Nuovi lead!', {
+      body: `${count} nuovi record rilevati nel CSV. Aggiorna il database per vederli.`,
+      icon: ''
+    });
+  }
+}
+function requestNotificationPermission(){
+  if('Notification' in window && Notification.permission === 'default'){
+    Notification.requestPermission();
+  }
+}
+
+/* ═══════════════ RADAR ═══════════════ */
+function renderRadar(catFilter='tutti'){
+  const grid = document.getElementById('radarGrid');
+  if(!grid) return;
+  const sources = catFilter === 'tutti' ? RADAR_SOURCES : RADAR_SOURCES.filter(s=>s.cat===catFilter);
+  grid.innerHTML = sources.map(s => `
+    <div class="radar-card" data-cat="${s.cat}">
+      <div class="radar-cat-label">${catLabel(s.cat)}</div>
+      <div class="radar-name">${s.name}</div>
+      <div class="radar-desc">${s.desc}</div>
+      <div class="radar-tip">${s.tip}</div>
+      <div class="radar-actions">
+        <a class="btn" href="${s.url}" target="_blank" rel="noopener" style="font-size:10px;padding:6px 10px">Apri fonte →</a>
+        <button class="btn light" onclick="addRadarAsLead('${encodeURIComponent(s.name)}','${encodeURIComponent(s.url)}')" style="font-size:10px;padding:6px 10px">+ Aggiungi lead</button>
+      </div>
+    </div>
+  `).join('');
+  updateRadarTime();
+}
+function catLabel(cat){
+  const map={aste:'Aste Giudiziarie',annunci:'Annunci Privati',social:'Social & Community',istituzionale:'Istituzionale',segnali:'Segnali & Intelligence'};
+  return map[cat]||cat;
+}
+function filterRadar(cat, btn){
+  document.querySelectorAll('.radar-tab').forEach(t=>t.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderRadar(cat);
+}
+function updateRadarTime(){
+  const el = document.getElementById('radarLastCheck');
+  if(el) el.textContent = new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+}
+function addRadarAsLead(encodedName, encodedUrl){
+  const name = decodeURIComponent(encodedName);
+  const url = decodeURIComponent(encodedUrl);
+  const manual = getManual();
+  const rec = {
+    "ID": 'RAD-' + String(manual.length+1).padStart(3,'0'),
+    "Categoria": "Lead puliti",
+    "Divisione": "Acquisizione incarichi",
+    "Zona": "Torino",
+    "Titolo / Asset": name,
+    "Link diretto": url,
+    "Canale / Contatto": "Radar fonti terze",
+    "Stato / Prossima azione": "Da verificare — Aprire fonte e cercare opportunità/contatti"
+  };
+  manual.push(rec); setManual(manual);
+  updateKpis();
+  alert(`Aggiunto al database:\n${name}`);
+}
+
+/* ═══════════════ ANALISI LEAD — CLAUDE API ═══════════════ */
+async function analyzeLeadWithAI(record){
+  openModal(record);
+  const prompt = `Sei l'assistente operativo di Giamma Bellato, agente immobiliare a Torino.
+Zone prioritarie: Crocetta, Borgo Po, Gran Madre, Collina, Centro storico, Precollina.
+Regole: solo privati (no agenzie), solo contatti pubblici, max 1 contatto soft per agenzia.
+
+Analizza questo lead e produci un'analisi completa:
+
+LEAD:
+- ID: ${record.ID}
+- Zona: ${record.Zona}
+- Asset: ${record['Titolo / Asset']}
+- Categoria: ${record.Categoria}
+- Divisione: ${record.Divisione}
+- Canale: ${record['Canale / Contatto']}
+- Stato attuale: ${record['Stato / Prossima azione']}
+- Link: ${record['Link diretto'] || 'assente'}
+
+Rispondi SOLO con un oggetto JSON valido, nessun testo prima o dopo:
+{
+  "score": "A",
+  "score_label": "Chiama oggi",
+  "motivo": "spiegazione breve del perché questo score",
+  "azione": "cosa fare adesso — specifico e operativo",
+  "whatsapp": "messaggio WhatsApp pronto da inviare — max 5 righe — tono consulente non venditore — firma Giamma Bellato",
+  "email_oggetto": "oggetto email",
+  "email_corpo": "corpo email pronto — max 8 righe — firma con GIAMMARIABELLATO@GMAIL.COM",
+  "follow_up": "messaggio follow-up breve se non risponde entro 5 giorni — max 3 righe"
+}
+
+Score A = chiama oggi (link diretto + zona premium + contatto verificabile)
+Score B = chiama questa settimana (zona ok, contatto da verificare)
+Score C = monitora (zona secondaria o link mancante o categoria sospesi/watchlist)`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user', content: prompt}]
+      })
+    });
+    const data = await res.json();
+    const raw = data.content?.find(b=>b.type==='text')?.text || '';
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    renderAnalysis(record, parsed);
+  } catch(e) {
+    renderError(e.message);
+  }
+}
+
+function openModal(record){
+  document.getElementById('modalTitle').textContent = `⚡ ${record.ID} — ${record.Zona}`;
+  document.getElementById('modalBody').innerHTML = `<div class="modal-loading">Analisi AI in corso — attendi qualche secondo<span id="loadingDots"></span></div>`;
+  document.getElementById('analysisModal').classList.add('open');
+  // Animate dots
+  let d=0; const dots=['','.','..','.​.​.']; 
+  const iv=setInterval(()=>{const el=document.getElementById('loadingDots'); if(el){el.textContent=dots[d%4];d++;}else clearInterval(iv);},400);
+}
+
+function closeModal(){
+  document.getElementById('analysisModal').classList.remove('open');
+}
+function closeModalOnBg(e){
+  if(e.target===document.getElementById('analysisModal')) closeModal();
+}
+
+function renderAnalysis(record, a){
+  const scoreColors = {A:'score-A', B:'score-B', C:'score-C'};
+  const cls = scoreColors[a.score] || 'score-C';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="score-block">
+      <div class="score-letter ${cls}">${a.score}</div>
+      <div class="score-info">
+        <div class="score-label">Priorità — ${esc(a.score_label||'')}</div>
+        <div class="score-motivo">${esc(a.motivo||'')}</div>
+      </div>
+    </div>
+
+    <div class="analysis-section">
+      <div class="analysis-label">Azione immediata</div>
+      <div class="analysis-text">${esc(a.azione||'')}</div>
+    </div>
+
+    <div class="analysis-section">
+      <div class="analysis-label">WhatsApp — pronto da inviare</div>
+      <div class="analysis-text" id="waText">${esc(a.whatsapp||'')}</div>
+      <button class="copy-btn" onclick="copyText('waText',this)">Copia WhatsApp</button>
+    </div>
+
+    <div class="analysis-section">
+      <div class="analysis-label">Email</div>
+      <div class="analysis-text"><strong>Oggetto:</strong> ${esc(a.email_oggetto||'')}\n\n${esc(a.email_corpo||'')}</div>
+      <button class="copy-btn" onclick="copyField('${esc(a.email_oggetto||'')}','${esc(a.email_corpo||'')}',this)">Copia Email</button>
+    </div>
+
+    <div class="analysis-section">
+      <div class="analysis-label">Follow-up (se non risponde entro 5 giorni)</div>
+      <div class="analysis-text" id="fuText">${esc(a.follow_up||'')}</div>
+      <button class="copy-btn" onclick="copyText('fuText',this)">Copia Follow-up</button>
+    </div>
+  `;
+}
+
+function renderError(msg){
+  document.getElementById('modalBody').innerHTML = `<div class="modal-error">Errore nell'analisi: ${esc(msg)}<br><br>Verifica la connessione e riprova.</div>`;
+}
+
+function copyText(elemId, btn){
+  const el = document.getElementById(elemId);
+  if(!el) return;
+  navigator.clipboard.writeText(el.textContent).then(()=>{
+    btn.textContent='✓ Copiato!'; btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copia'; btn.classList.remove('copied');}, 2000);
+  });
+}
+function copyField(sogg, corpo, btn){
+  const text = `Oggetto: ${sogg}\n\n${corpo}`;
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='✓ Copiata!'; btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='Copia Email'; btn.classList.remove('copied');}, 2000);
+  });
+}
+
+/* ═══════════════ HEADER DATE ═══════════════ */
+function setHeaderDate(){
+  const d = new Date();
+  const opts = {weekday:'long',day:'numeric',month:'long',year:'numeric'};
+  const el = document.getElementById('headerDate');
+  if(el) el.textContent = d.toLocaleDateString('it-IT',opts);
+}
+
+/* ═══════════════ INIT ═══════════════ */
+document.addEventListener('DOMContentLoaded',()=>{
+  setHeaderDate();
+  updateKpis();
+  requestNotificationPermission();
+  startSheetWatch();
+
+  document.getElementById('slimDashboardCsv').addEventListener('change',e=>{
+    const file=e.target.files[0]; if(!file)return;
+    const reader=new FileReader();
+    reader.onload=()=>importCruscotto(reader.result, false);
+    reader.readAsText(file,'utf-8');
+  });
+  document.getElementById('conversationCsvInline').addEventListener('change',e=>{
+    const file=e.target.files[0]; if(!file)return;
+    const reader=new FileReader();
+    reader.onload=()=>importCruscotto(reader.result, false);
+    reader.readAsText(file,'utf-8');
+  });
+});
+</script>
+</body>
+</html>
