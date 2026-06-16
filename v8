@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GB Immobiliare — Cruscotto Torino · v8</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0F0C08;
+  --cream:#F7F2EA;
+  --card:#FDFAF5;
+  --gold:#C9A84C;
+  --gold-dark:#8B6914;
+  --border:#E2D9C8;
+  --warm:#8B7355;
+  --red:#C0392B;
+  --green:#2E7D4F;
+  --blue:#1A5276;
+  --muted:#9E8E7A;
+  --shadow:0 2px 12px rgba(15,12,8,.08);
+}
+body{background:var(--cream);color:var(--ink);font-family:'DM Mono',monospace;font-size:13px;line-height:1.6;min-height:100vh}
+
+/* HEADER */
+.header{background:var(--ink);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.brand{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--cream);letter-spacing:.04em}
+.brand span{color:var(--gold)}
+.header-meta{font-size:10px;color:var(--warm);letter-spacing:.12em;text-transform:uppercase;text-align:right}
+.header-date{color:var(--gold);font-size:11px;margin-top:2px}
+
+/* NAV */
+.nav{background:var(--card);border-bottom:1px solid var(--border);display:flex;gap:0;position:sticky;top:57px;z-index:99}
+.nav-btn{padding:14px 28px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;border:none;background:transparent;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .15s}
+.nav-btn.active{color:var(--ink);border-bottom-color:var(--gold);font-weight:500}
+.nav-btn:hover:not(.active){color:var(--ink)}
+.nav-count{display:inline-block;background:var(--gold);color:var(--ink);border-radius:10px;padding:1px 7px;font-size:9px;margin-left:6px;font-weight:500}
+
+/* PAGES */
+.page{display:none;padding:28px 32px;max-width:1200px;margin:0 auto}
+.page.active{display:block}
+
+/* KPI BAR */
+.kpi-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:16px 20px;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--gold)}
+.kpi-n{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:600;color:var(--ink);line-height:1}
+.kpi-l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:4px}
+
+/* SECTION HEADER */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:var(--ink)}
+.sec-sub{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border:1px solid var(--gold);background:var(--gold);color:var(--ink);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;cursor:pointer;border-radius:2px;transition:all .15s;font-weight:500}
+.btn:hover{background:var(--gold-dark);border-color:var(--gold-dark);color:var(--cream)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--border)}
+.btn.ghost:hover{border-color:var(--gold);color:var(--gold-dark)}
+.btn.danger{background:transparent;color:var(--red);border-color:var(--red)}
+.btn.danger:hover{background:var(--red);color:#fff}
+.btn.sm{padding:5px 12px;font-size:10px}
+
+/* FORM PANEL */
+.form-panel{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:24px;margin-bottom:24px;display:none}
+.form-panel.open{display:block}
+.form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.field label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;padding:9px 12px;border:1px solid var(--border);background:var(--cream);font-family:'DM Mono',monospace;font-size:12px;color:var(--ink);border-radius:2px;outline:none;transition:border .15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}
+.field textarea{resize:vertical;min-height:72px}
+.form-actions{display:flex;gap:8px;margin-top:8px}
+
+/* SEARCH + FILTER BAR */
+.toolbar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.search-box{flex:1;min-width:200px;padding:9px 14px;border:1px solid var(--border);background:var(--card);font-family:'DM Mono',monospace;font-size:12px;color:var(--ink);border-radius:2px;outline:none}
+.search-box:focus{border-color:var(--gold)}
+.filter-chip{padding:6px 14px;border:1px solid var(--border);background:transparent;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;cursor:pointer;border-radius:20px;color:var(--muted);transition:all .15s}
+.filter-chip.on{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+
+/* LEAD CARDS — Lista chiamate */
+.call-list{display:flex;flex-direction:column;gap:10px}
+.call-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:18px 20px;display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:start;transition:box-shadow .15s}
+.call-card:hover{box-shadow:var(--shadow)}
+.call-card.priority-a{border-left:3px solid var(--red)}
+.call-card.priority-b{border-left:3px solid var(--gold)}
+.call-card.priority-c{border-left:3px solid var(--muted)}
+.call-rank{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--border);font-weight:600;line-height:1;width:32px;text-align:center}
+.call-body .asset{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:500;color:var(--ink);margin-bottom:4px}
+.call-body .zona{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold-dark);margin-bottom:6px}
+.call-body .note{font-size:11px;color:var(--warm);line-height:1.5}
+.call-meta{font-size:10px;color:var(--muted);display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.call-actions{display:flex;gap:6px;margin-top:8px;grid-column:2/-1}
+.tag{display:inline-block;padding:2px 8px;border-radius:2px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;font-weight:500}
+.tag.fonte{background:#EEE8DA;color:var(--warm)}
+.tag.stato{background:#E8F0E8;color:var(--green)}
+.tag.caldo{background:#FDECEA;color:var(--red)}
+.tag.tiepido{background:#FEF9E7;color:#B7950B}
+.tag.freddo{background:#EAF2FB;color:var(--blue)}
+
+/* DATABASE TABLE */
+.db-table-wrap{background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.db-table{width:100%;border-collapse:collapse}
+.db-table thead{background:var(--ink)}
+.db-table th{padding:10px 14px;font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);font-weight:500;text-align:left;white-space:nowrap}
+.db-table td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:top;font-size:11px}
+.db-table tr:last-child td{border-bottom:none}
+.db-table tr:hover td{background:#FAF7F2}
+.db-table .td-asset{font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:500;max-width:220px}
+.db-table .td-zona{font-size:10px;color:var(--gold-dark);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
+.db-table .td-fonte{color:var(--muted);white-space:nowrap}
+.db-table .td-data{color:var(--muted);white-space:nowrap;font-size:10px}
+.db-table .td-note{color:var(--warm);max-width:240px;font-size:11px;line-height:1.4}
+.db-table .td-azioni{white-space:nowrap}
+.link-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;background:transparent;border:1px solid var(--border);border-radius:2px;font-size:10px;color:var(--ink);cursor:pointer;text-decoration:none;font-family:'DM Mono',monospace;transition:all .15s}
+.link-btn:hover{border-color:var(--gold);color:var(--gold-dark)}
+.trash-btn{display:inline-flex;align-items:center;padding:3px 8px;background:transparent;border:1px solid transparent;border-radius:2px;font-size:12px;cursor:pointer;color:var(--muted);transition:all .15s}
+.trash-btn:hover{color:var(--red);border-color:var(--red)}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-icon{font-size:36px;margin-bottom:12px;opacity:.4}
+.empty-title{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--warm);margin-bottom:6px}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--ink);color:var(--cream);padding:12px 20px;border-radius:4px;font-size:11px;border-left:3px solid var(--gold);opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,12,8,.5);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:28px;max-width:480px;width:90%}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:20px;margin-bottom:8px}
+.modal-body{font-size:12px;color:var(--warm);margin-bottom:20px;line-height:1.6}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .page{padding:16px}
+  .kpi-bar{grid-template-columns:repeat(2,1fr)}
+  .form-grid{grid-template-columns:1fr}
+  .form-grid-2{grid-template-columns:1fr}
+  .call-card{grid-template-columns:1fr}
+  .call-rank{display:none}
+  .nav-btn{padding:12px 14px;font-size:10px}
+  .header{padding:14px 16px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="brand">GB <span>Immobiliare</span></div>
+  </div>
+  <div class="header-meta">
+    Cruscotto Operativo · Torino · v8
+    <div class="header-date" id="headerDate"></div>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showPage('chiamate')" id="nav-chiamate">
+    📞 Lista chiamate <span class="nav-count" id="cnt-chiamate">0</span>
+  </button>
+  <button class="nav-btn" onclick="showPage('database')" id="nav-database">
+    🗂 Database <span class="nav-count" id="cnt-database">0</span>
+  </button>
+  <button class="nav-btn" onclick="showPage('aggiungi')" id="nav-aggiungi">
+    + Aggiungi lead
+  </button>
+</nav>
+
+<!-- PAGE: LISTA CHIAMATE -->
+<div class="page active" id="page-chiamate">
+  <div class="kpi-bar">
+    <div class="kpi">
+      <div class="kpi-n" id="kpi-tot">0</div>
+      <div class="kpi-l">Lead totali</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-n" id="kpi-caldi">0</div>
+      <div class="kpi-l">🔴 Caldi</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-n" id="kpi-followup">0</div>
+      <div class="kpi-l">Follow-up attivi</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-n" id="kpi-oggi">0</div>
+      <div class="kpi-l">Aggiunti oggi</div>
+    </div>
+  </div>
+
+  <div class="sec-head">
+    <div>
+      <div class="sec-title">Lista chiamate</div>
+      <div class="sec-sub">Priorità A prima — ordine per data aggiunta</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn ghost sm" onclick="showPage('aggiungi')">+ Nuovo lead</button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <input class="search-box" placeholder="Cerca per nome, zona, note…" oninput="renderChiamate(this.value)" id="searchChiamate">
+    <button class="filter-chip on" onclick="toggleChip(this,'Tutti')" data-filter="Tutti">Tutti</button>
+    <button class="filter-chip" onclick="toggleChip(this,'A')" data-filter="A">🔴 Priorità A</button>
+    <button class="filter-chip" onclick="toggleChip(this,'B')" data-filter="B">🟡 Priorità B</button>
+    <button class="filter-chip" onclick="toggleChip(this,'C')" data-filter="C">⚪ Priorità C</button>
+  </div>
+
+  <div class="call-list" id="callList"></div>
+</div>
+
+<!-- PAGE: DATABASE -->
+<div class="page" id="page-database">
+  <div class="sec-head">
+    <div>
+      <div class="sec-title">Database lead</div>
+      <div class="sec-sub">Tutti i contatti — ordine cronologico inverso</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn ghost sm" onclick="esportaCsv()">↓ Esporta CSV</button>
+      <button class="btn ghost sm" onclick="showPage('aggiungi')">+ Nuovo lead</button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <input class="search-box" placeholder="Cerca per nome, zona, fonte, note…" oninput="renderDatabase(this.value)" id="searchDb">
+    <select class="search-box" style="flex:0;width:auto" onchange="renderDatabase(document.getElementById('searchDb').value,this.value)" id="filterZona">
+      <option value="">Tutte le zone</option>
+      <option>Crocetta</option>
+      <option>Borgo Po</option>
+      <option>Gran Madre</option>
+      <option>Collina</option>
+      <option>Centro storico</option>
+      <option>Precollina</option>
+      <option>Val Salice</option>
+      <option>Crimea</option>
+      <option>Quadrilatero Romano</option>
+      <option>Altra zona</option>
+    </select>
+    <select class="search-box" style="flex:0;width:auto" onchange="renderDatabase(document.getElementById('searchDb').value,document.getElementById('filterZona').value,this.value)" id="filterPri">
+      <option value="">Tutte le priorità</option>
+      <option>A</option>
+      <option>B</option>
+      <option>C</option>
+    </select>
+  </div>
+
+  <div class="db-table-wrap">
+    <table class="db-table">
+      <thead>
+        <tr>
+          <th>Asset / Contatto</th>
+          <th>Zona</th>
+          <th>Fonte</th>
+          <th>Priorità</th>
+          <th>Data aggiunta</th>
+          <th>Note</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="dbBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PAGE: AGGIUNGI -->
+<div class="page" id="page-aggiungi">
+  <div class="sec-head">
+    <div>
+      <div class="sec-title">Nuovo lead</div>
+      <div class="sec-sub">Compila e salva — la data viene aggiunta automaticamente</div>
+    </div>
+  </div>
+
+  <div class="form-panel open" style="max-width:800px">
+    <div class="form-grid">
+      <div class="field">
+        <label>Asset / Contatto *</label>
+        <input id="fAsset" placeholder="Es. Via Lamarmora 80 — quadrilocale">
+      </div>
+      <div class="field">
+        <label>Zona *</label>
+        <select id="fZona">
+          <option value="">— seleziona —</option>
+          <option>Crocetta</option>
+          <option>Borgo Po</option>
+          <option>Gran Madre</option>
+          <option>Collina</option>
+          <option>Centro storico</option>
+          <option>Precollina</option>
+          <option>Val Salice</option>
+          <option>Crimea</option>
+          <option>Quadrilatero Romano</option>
+          <option>Altra zona</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Fonte</label>
+        <select id="fFonte">
+          <option>Idealista</option>
+          <option>Casa.it</option>
+          <option>Immobiliare.it</option>
+          <option>TrovaCasa</option>
+          <option>Facebook</option>
+          <option>LinkedIn</option>
+          <option>Passaparola</option>
+          <option>Altro</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-grid-2">
+      <div class="field">
+        <label>Link diretto</label>
+        <input id="fLink" placeholder="https://…">
+      </div>
+      <div class="field">
+        <label>Contatto (telefono / email / form)</label>
+        <input id="fContatto" placeholder="Es. +39 333 123456 — solo se pubblico">
+      </div>
+    </div>
+    <div class="form-grid-2">
+      <div class="field">
+        <label>Priorità</label>
+        <select id="fPriorita">
+          <option value="A">A — Chiama oggi</option>
+          <option value="B" selected>B — Verifica e chiama</option>
+          <option value="C">C — Monitorare</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Temperatura</label>
+        <select id="fTemp">
+          <option value="caldo">🔴 Caldo</option>
+          <option value="tiepido" selected>🟡 Tiepido</option>
+          <option value="freddo">🔵 Freddo</option>
+        </select>
+      </div>
+    </div>
+    <div class="field" style="margin-bottom:16px">
+      <label>Note operative</label>
+      <textarea id="fNote" placeholder="Dettagli utili: mq, prezzo, situazione proprietario, prossima azione…"></textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn" onclick="salvaLead()">✓ Salva lead</button>
+      <button class="btn ghost" onclick="resetForm()">Cancella</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFERMA ELIMINA -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div class="modal-title">Cestina questo lead?</div>
+    <div class="modal-body" id="deleteModalBody">Questa azione è irreversibile.</div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModal()">Annulla</button>
+      <button class="btn danger" onclick="confirmDelete()">🗑 Cestina</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════ STORAGE ═══════════════ */
+const KEY = 'gb_cruscotto_v8';
+let deleteTarget = null;
+let chipFilter = 'Tutti';
+
+function getLeads(){
+  try{ return JSON.parse(localStorage.getItem(KEY)||'[]'); }
+  catch(e){ return []; }
+}
+function setLeads(arr){ localStorage.setItem(KEY, JSON.stringify(arr)); }
+
+function newId(){
+  const leads = getLeads();
+  const nums = leads.map(l => parseInt((l.id||'TO-000').replace('TO-',''))||0);
+  const next = nums.length ? Math.max(...nums)+1 : 1;
+  return 'TO-' + String(next).padStart(3,'0');
+}
+
+/* ═══════════════ NAV ═══════════════ */
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  if(name==='chiamate') renderChiamate();
+  if(name==='database') renderDatabase();
+}
+
+/* ═══════════════ CHIPS FILTER ═══════════════ */
+function toggleChip(el, val){
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  chipFilter = val;
+  renderChiamate(document.getElementById('searchChiamate').value);
+}
+
+/* ═══════════════ KPI ═══════════════ */
+function updateKpi(){
+  const leads = getLeads();
+  const oggi = todayStr();
+  document.getElementById('kpi-tot').textContent = leads.length;
+  document.getElementById('kpi-caldi').textContent = leads.filter(l=>l.temp==='caldo').length;
+  document.getElementById('kpi-followup').textContent = leads.filter(l=>l.priorita==='A'||l.priorita==='B').length;
+  document.getElementById('kpi-oggi').textContent = leads.filter(l=>l.dataAggiunta===oggi).length;
+  document.getElementById('cnt-chiamate').textContent = leads.filter(l=>l.priorita==='A'||l.priorita==='B').length;
+  document.getElementById('cnt-database').textContent = leads.length;
+}
+
+function todayStr(){
+  return new Date().toISOString().slice(0,10);
+}
+function fmtDate(d){
+  if(!d) return '—';
+  const [y,m,g] = d.split('-');
+  return `${g}/${m}/${y}`;
+}
+
+/* ═══════════════ RENDER CHIAMATE ═══════════════ */
+function renderChiamate(q=''){
+  updateKpi();
+  let leads = getLeads();
+  // ordine: A prima, poi B, poi C; dentro stesso gruppo per data decrescente
+  leads.sort((a,b)=>{
+    const pa = {A:0,B:1,C:2}[a.priorita]??2;
+    const pb = {A:0,B:1,C:2}[b.priorita]??2;
+    if(pa!==pb) return pa-pb;
+    return (b.dataAggiunta||'').localeCompare(a.dataAggiunta||'');
+  });
+
+  if(chipFilter!=='Tutti') leads = leads.filter(l=>l.priorita===chipFilter);
+  if(q) {
+    const qlo = q.toLowerCase();
+    leads = leads.filter(l =>
+      (l.asset||'').toLowerCase().includes(qlo) ||
+      (l.zona||'').toLowerCase().includes(qlo) ||
+      (l.note||'').toLowerCase().includes(qlo) ||
+      (l.contatto||'').toLowerCase().includes(qlo)
+    );
+  }
+
+  const el = document.getElementById('callList');
+  if(!leads.length){
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">Nessun lead in lista chiamate</div><div style="font-size:11px;color:var(--muted);margin-top:6px">Aggiungi il primo lead dalla tab "+ Aggiungi lead"</div></div>`;
+    return;
+  }
+
+  el.innerHTML = leads.map((l,i) => {
+    const tempTag = l.temp==='caldo' ? '<span class="tag caldo">🔴 Caldo</span>' :
+                    l.temp==='tiepido' ? '<span class="tag tiepido">🟡 Tiepido</span>' :
+                    '<span class="tag freddo">🔵 Freddo</span>';
+    const linkBtn = l.link ? `<a class="link-btn" href="${escHtml(l.link)}" target="_blank">↗ Apri annuncio</a>` : '';
+    const contattoBtn = l.contatto ? `<span class="link-btn" style="cursor:default">📞 ${escHtml(l.contatto)}</span>` : '';
+    return `
+    <div class="call-card priority-${(l.priorita||'c').toLowerCase()}" id="card-${l.id}">
+      <div class="call-rank">${i+1}</div>
+      <div class="call-body">
+        <div class="asset">${escHtml(l.asset||'—')}</div>
+        <div class="zona">${escHtml(l.zona||'')} ${l.fonte ? '· '+escHtml(l.fonte) : ''}</div>
+        <div style="margin:6px 0;display:flex;gap:6px;flex-wrap:wrap">${tempTag} ${l.priorita==='A'?'<span class="tag caldo">Priorità A</span>':l.priorita==='B'?'<span class="tag tiepido">Priorità B</span>':'<span class="tag" style="background:#EEE;color:#888">Priorità C</span>'}</div>
+        ${l.note ? `<div class="note">${escHtml(l.note)}</div>` : ''}
+        <div class="call-actions" style="margin-top:10px">
+          ${linkBtn}
+          ${contattoBtn}
+          <button class="link-btn" style="color:var(--muted)" onclick="editNotePrompt('${l.id}')">✏ Note</button>
+          <button class="trash-btn" onclick="openDelete('${l.id}','${escHtml(l.asset||'')}')">🗑</button>
+        </div>
+      </div>
+      <div class="call-meta">
+        <span>Aggiunto: ${fmtDate(l.dataAggiunta)}</span>
+        <span style="color:var(--gold-dark)">${l.id}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ═══════════════ RENDER DATABASE ═══════════════ */
+function renderDatabase(q='', zona='', pri=''){
+  updateKpi();
+  let leads = getLeads();
+  leads.sort((a,b)=>(b.dataAggiunta||'').localeCompare(a.dataAggiunta||''));
+
+  if(q){
+    const qlo=q.toLowerCase();
+    leads=leads.filter(l=>
+      (l.asset||'').toLowerCase().includes(qlo)||
+      (l.zona||'').toLowerCase().includes(qlo)||
+      (l.fonte||'').toLowerCase().includes(qlo)||
+      (l.note||'').toLowerCase().includes(qlo)||
+      (l.contatto||'').toLowerCase().includes(qlo)||
+      (l.id||'').toLowerCase().includes(qlo)
+    );
+  }
+  if(zona) leads=leads.filter(l=>l.zona===zona);
+  if(pri) leads=leads.filter(l=>l.priorita===pri);
+
+  const tbody = document.getElementById('dbBody');
+  if(!leads.length){
+    tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">Nessun lead trovato</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = leads.map(l=>{
+    const linkBtn = l.link ? `<a class="link-btn" href="${escHtml(l.link)}" target="_blank">↗</a>` : '';
+    const priColor = l.priorita==='A'?'var(--red)':l.priorita==='B'?'#B7950B':'var(--muted)';
+    return `<tr>
+      <td class="td-asset">${escHtml(l.asset||'—')}<br><small style="color:var(--muted);font-size:10px">${l.id}</small></td>
+      <td class="td-zona">${escHtml(l.zona||'—')}</td>
+      <td class="td-fonte">${escHtml(l.fonte||'—')}</td>
+      <td><span style="font-weight:500;color:${priColor}">${l.priorita||'—'}</span></td>
+      <td class="td-data">${fmtDate(l.dataAggiunta)}</td>
+      <td class="td-note">${escHtml(l.note||'—')}</td>
+      <td class="td-azioni" style="display:flex;gap:4px;align-items:center">${linkBtn}<button class="trash-btn" onclick="openDelete('${l.id}','${escHtml(l.asset||'')}')">🗑</button></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ═══════════════ SALVA LEAD ═══════════════ */
+function salvaLead(){
+  const asset = document.getElementById('fAsset').value.trim();
+  const zona = document.getElementById('fZona').value;
+  if(!asset){ showToast('⚠ Inserisci almeno il nome/asset del lead'); return; }
+  if(!zona){ showToast('⚠ Seleziona la zona'); return; }
+
+  const lead = {
+    id: newId(),
+    asset,
+    zona,
+    fonte: document.getElementById('fFonte').value,
+    link: document.getElementById('fLink').value.trim(),
+    contatto: document.getElementById('fContatto').value.trim(),
+    priorita: document.getElementById('fPriorita').value,
+    temp: document.getElementById('fTemp').value,
+    note: document.getElementById('fNote').value.trim(),
+    dataAggiunta: todayStr()
+  };
+
+  const leads = getLeads();
+  leads.unshift(lead);
+  setLeads(leads);
+  resetForm();
+  showToast(`✓ Lead salvato — ${lead.id}`);
+  showPage('chiamate');
+}
+
+function resetForm(){
+  ['fAsset','fLink','fContatto','fNote'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fZona').value='';
+  document.getElementById('fFonte').value='Idealista';
+  document.getElementById('fPriorita').value='B';
+  document.getElementById('fTemp').value='tiepido';
+}
+
+/* ═══════════════ NOTE RAPIDE ═══════════════ */
+function editNotePrompt(id){
+  const leads = getLeads();
+  const l = leads.find(x=>x.id===id);
+  if(!l) return;
+  const nota = prompt(`Note per ${l.id} — ${l.asset}\n\n(sovrascrivi o aggiungi)`, l.note||'');
+  if(nota===null) return;
+  l.note = nota.trim();
+  setLeads(leads);
+  renderChiamate(document.getElementById('searchChiamate').value);
+  showToast('✓ Note aggiornate');
+}
+
+/* ═══════════════ DELETE ═══════════════ */
+function openDelete(id, asset){
+  deleteTarget = id;
+  document.getElementById('deleteModalBody').textContent = `Vuoi cestinare "${asset}" (${id})? Questa azione è irreversibile.`;
+  document.getElementById('deleteModal').classList.add('open');
+}
+function closeModal(){
+  deleteTarget=null;
+  document.getElementById('deleteModal').classList.remove('open');
+}
+function confirmDelete(){
+  if(!deleteTarget) return;
+  const leads = getLeads().filter(l=>l.id!==deleteTarget);
+  setLeads(leads);
+  closeModal();
+  showToast('🗑 Lead eliminato');
+  renderChiamate(document.getElementById('searchChiamate').value);
+  renderDatabase(document.getElementById('searchDb').value);
+}
+
+/* ═══════════════ EXPORT CSV ═══════════════ */
+function esportaCsv(){
+  const leads = getLeads();
+  const h = ['ID','Asset','Zona','Fonte','Link','Contatto','Priorità','Temperatura','Note','Data aggiunta'];
+  const rows = leads.map(l=>[l.id,l.asset,l.zona,l.fonte,l.link,l.contatto,l.priorita,l.temp,l.note,l.dataAggiunta].map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(','));
+  const csv = [h.join(','),...rows].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download = `GB_Cruscotto_${todayStr()}.csv`;
+  a.click();
+  showToast('✓ CSV esportato');
+}
+
+/* ═══════════════ UTILS ═══════════════ */
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function showToast(msg, dur=2800){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), dur);
+}
+
+/* ═══════════════ INIT ═══════════════ */
+document.addEventListener('DOMContentLoaded',()=>{
+  const d = new Date();
+  document.getElementById('headerDate').textContent = d.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  updateKpi();
+  renderChiamate();
+  // chiudi modal cliccando fuori
+  document.getElementById('deleteModal').addEventListener('click',function(e){
+    if(e.target===this) closeModal();
+  });
+});
+</script>
+</body>
+</html>
